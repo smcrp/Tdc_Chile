@@ -59,10 +59,10 @@ public class AdapterList extends BaseAdapter {
 
         Question objprop = (Question) getItem(position);
 
-        TextView tvNombre = (TextView) view.findViewById(R.id.name);
-        EditText txtId = (EditText) view.findViewById(R.id.id);
+        //TextView tvNombre = (TextView) view.findViewById(R.id.name);
+       // EditText txtId = (EditText) view.findViewById(R.id.id);
 
-        tvNombre.setText(objprop.getName().toString());
+        //tvNombre.setText(objprop.getName().toString());
         /*txtId.setText(objprop.getId().toString());*/
 
         return v;

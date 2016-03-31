@@ -9,6 +9,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.EditText;
@@ -23,6 +25,7 @@ import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -69,6 +72,7 @@ import Levantamiento.Registro;
             setSupportActionBar(toolbar);
 
             listaQuestion = (ListView) findViewById(R.id.listview);
+            listaQuestion.setItemsCanFocus(true);
             antenalist = new ArrayList<HashMap<String, String>>();
             new CargarListTask().execute();
 
@@ -92,7 +96,7 @@ import Levantamiento.Registro;
 
                 }
             });
-            client.excecute("http://186.103.141.44/TorresUnidas.com.Api/index.php/api/Levantamiento/questionAntenna");
+            client.excecute(URL_ANTENA);
 
 
             /////////////////
@@ -116,13 +120,9 @@ import Levantamiento.Registro;
             }
         }
 
-
-
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
-            // Handle action bar item clicks here. The action bar will
-            // automatically handle clicks on the Home/Up button, so long
-            // as you specify a parent activity in AndroidManifest.xml.
+
             int id = item.getItemId();
 
             //noinspection SimplifiableIfStatement
@@ -157,10 +157,6 @@ import Levantamiento.Registro;
                 boolean resultado = true;
                 arrregs = new ArrayList<Registro>();
 
-                //JSONObject json = jsonParser.makeHttpRequest(URL_FORO,"GET",param);
-
-                // Log.d("Fros",json.toString());
-
                 try {
 
                     jsono = new JSONObject(params[0].getResult());
@@ -189,9 +185,7 @@ import Levantamiento.Registro;
                             question.setType(l.getString("type"));
                             question.setIdType(l.getString("idtype"));
 
-                            Log.d("Id type:::::", l.getString("name"));
-                            //arrayQuestions.add(question);
-                            //arrquest.add(question);
+                            //Log.d("Id type:::::", l.getString("name"));
                             //arrayQuestions.add(question);
                             arrquest.add(question);
                         }
@@ -221,7 +215,6 @@ import Levantamiento.Registro;
             protected void onPostExecute(Boolean aBoolean) {
 
                 if (aBoolean == true){
-
                     adapter = new AdapterList(LevantamientoActivity.this, registro.getQuestions());
                     listaQuestion.setAdapter(adapter);
 
@@ -232,27 +225,20 @@ import Levantamiento.Registro;
 
             }
 
-            /*protected void onPostExecute(String s) {
-
-                if (s == null){
-
-                    adapter = new Adapterlist(LevantamientoActivity.this,arrquest);
-                    listaQuestion.setAdapter(adapter);
-                }
-            }*/
         }
 
         public class AdapterList extends BaseAdapter {
 
-            private final Activity _context;
+            private final Context _context;
             LayoutInflater lInflater;
             private ArrayList<Question>_listData;
 
 
-            public AdapterList(Activity context, ArrayList<Question> listData) {
+
+            public AdapterList(Context context, ArrayList<Question> listData) {
                 this._context=context;
                 this._listData=listData;
-                lInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+               // lInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             }
 
             @Override
@@ -261,165 +247,48 @@ import Levantamiento.Registro;
             }
 
             @Override
-            public Object getItem(int position) {
-                return _listData.get(position);
-            }
+            public Object getItem(int position) { return _listData.get(position); }
 
             @Override
-            public long getItemId(int position) {
-                return position;
-            }
+            public long getItemId(int position) { return position; }
 
             public View getView(int position,View view, ViewGroup parent){
-
-                View v = view;
-                //ASOCIAMOS LA VISTA AL LAYOUT DEL RECURSO XML DONDE ESTA LA BASE DE
-
-                if(v==null){
-                    LayoutInflater infalInflater = (LayoutInflater) this._context
+               ViewHolder holder;
+                if(view==null) {
+                    LayoutInflater inflater = (LayoutInflater) this._context
                             .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    v = infalInflater.inflate(R.layout.elementos_lista_levantamiento, null);
+                   /*view = inflater.inflate(R.layout.elements_list_levantamiento, null);*/
+
+                    holder = new ViewHolder();
+                    view = inflater.inflate(R.layout.elements_list_levantamiento, null);
+                    holder.caption = (EditText) view
+                            .findViewById(R.id.id);
+                    view.setTag(holder);
                 }
 
                 Question objprop = (Question) getItem(position);
 
-                TextView tvNombre = (TextView) v.findViewById(R.id.name);
-                EditText txtId = (EditText) v.findViewById(R.id.id);
-
+                TextView tvNombre = (TextView) view.findViewById(R.id.name);
                 tvNombre.setText(objprop.getName().toString());
-        /*txtId.setText(objprop.getId().toString());*/
 
-                return v;
+                //EditText txtId = (EditText) view.findViewById(R.id.id);
+
+               // txtId.setText(objprop.getId().toString());
+                return view;
             }
 
-            Question getQuestion(int position){
-                return ((Question)getItem(position));
-            }
+
 
 
 
         }
+        class ViewHolder {
+            EditText caption;
+        }
 
-
-
-        /*public class Adapterlist extends BaseExpandableListAdapter {
-
-            public   Context _context;
-
-            private ArrayList<Registro> _listRegistro;
-
-            //private ArrayList<Question> _listData;
-
-
-            public Adapterlist(Context context, ArrayList<Registro> listData) {
-                this._context = context;
-                this._listRegistro = listData;
-
-                //lInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            }
-            public Adapterlist(){
-
-            }
-
-
-            public int getGroupCount() {
-                //return this._groups.size();
-                return this._listRegistro.size();
-            }
-
-
-            public int getChildrenCount(int Groupposition) {
-                return this._listRegistro.get(Groupposition).getQuestions().size();
-            }
-
-            public Object getGroup(int Groupposition) {
-                return _listRegistro.get(Groupposition);
-            }
-
-
-            public Object getChild(int Groupposition, int Childposition) {
-                return _listRegistro.get(Groupposition).getQuestions().get(Childposition);
-            }
-
-
-            public long getGroupId(int Groupposition) {
-
-                return Groupposition;
-            }
-
-
-            public long getChildId(int Groupposition, int Childposition) {
-
-                return Childposition;
-            }
-
-            @Override
-            public boolean hasStableIds() {
-                return false;
-            }
-
-            @Override
-            public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-                return null;
-            }
-
-            @Override
-            public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View view, ViewGroup parent) {
-                Question objprop = (Question) getChild(groupPosition,childPosition);
-                //View v = view;
-                //ASOCIAMOS LA VISTA AL LAYOUT DEL RECURSO XML DONDE ESTA LA BASE DE
-
-                if (view == null) {
-
-                    LayoutInflater inflater = (LayoutInflater) this._context
-                            .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    view = inflater.inflate(R.layout.content_levantamiento,null);
-
-                    //v = lInflater.inflate(R.layout.content_levantamiento, null, true);
-                }
-
-                TextView tvNombre = (TextView) view.findViewById(R.id.name);
-                EditText txtId = (EditText) view.findViewById(R.id.id);
-
-                tvNombre.setText(objprop.getName());
-
-
-             //   return view;
-            }
-
-            @Override
-            public boolean isChildSelectable(int groupPosition, int childPosition) {
-                return false;
-            }
-
-            public View getView(int Groupposition,int Childposition, View view, ViewGroup parent) {
-               // Question objprop = (Question) getChild(Groupposition,Childposition);
-                //View v = view;
-                //ASOCIAMOS LA VISTA AL LAYOUT DEL RECURSO XML DONDE ESTA LA BASE DE
-
-                if (view == null) {
-
-                    LayoutInflater inflater = (LayoutInflater) this._context
-                            .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    view = inflater.inflate(R.layout.content_levantamiento,null);
-
-                    //v = lInflater.inflate(R.layout.content_levantamiento, null, true);
-                }
-
-                TextView tvNombre = (TextView) view.findViewById(R.id.name);
-                EditText txtId = (EditText) view.findViewById(R.id.id);
-
-                tvNombre.setText(objprop.getName());
-        /*txtId.setText(objprop.getId().toString());*/
-
-               // return view;
-           // }
-
-            /*Question getQuestion(int position) {
-                return ((Question) getItem(position));
-            }
-        }*/
-
+        class ListItem {
+            String caption;
+        }
 
 
     }
