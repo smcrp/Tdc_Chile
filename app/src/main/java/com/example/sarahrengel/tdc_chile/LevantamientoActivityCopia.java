@@ -127,9 +127,7 @@ public class LevantamientoActivityCopia extends AppCompatActivity
         Log.d("FORM NAME", formulario.getName());
 
         for (Question question : formulario.getQuestions()) {
-
-
-            Log.d("PREG ID", question.getId());
+            Log.d("PREG ID", String.valueOf(question.getId()));
             Log.d("PREG NAME", question.getName());
             Log.d("PREG TYPE", question.getType());
             Log.d("PREG IDTYPE", question.getIdType());

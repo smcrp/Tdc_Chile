@@ -2,14 +2,13 @@ package com.example.sarahrengel.tdc_chile;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,23 +16,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.EditText;
-import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import BD_Levantamiento.Historico;
 import Connection.HttpClient;
 import Connection.OnHttpRequestComplete;
 import Connection.Response;
@@ -58,6 +56,7 @@ import Levantamiento.Registro;
         AdapterList adapter;
         ArrayList<Question> arrquest;
         ArrayList<Registro> arrregs;
+        LinearLayout layout;
 
         private static final String URL_ANTENA = "http://186.103.141.44/TorresUnidas.com.Api/index.php/api/Levantamiento/questionAntenna";
 
@@ -71,18 +70,28 @@ import Levantamiento.Registro;
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
 
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
             listaQuestion = (ListView) findViewById(R.id.listview);
             listaQuestion.setItemsCanFocus(true);
-            antenalist = new ArrayList<HashMap<String, String>>();
-            new CargarListTask().execute();
 
-                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    leerRespuestas();
+                    final Intent intent = new Intent(getBaseContext(), LevantamientoProductoActivity.class);
+                    startActivity(intent);
+                }
+            });
+
+           /* DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+              this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
             drawer.setDrawerListener(toggle);
-            toggle.syncState();
+            toggle.syncState();*/
 
            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-            navigationView.setNavigationItemSelectedListener(this);
+           navigationView.setNavigationItemSelectedListener(this);
 
           //  StackContent = (LinearLayout) findViewById(R.id.StackContent);
             HttpClient client = new HttpClient(new OnHttpRequestComplete() {
@@ -93,12 +102,9 @@ import Levantamiento.Registro;
                         Log.e("onComplete","Status: "+status.toString());
                         new CargarListTask().execute(status);
                     }
-
                 }
             });
             client.excecute(URL_ANTENA);
-
-
             /////////////////
         }
         @Override
@@ -108,27 +114,15 @@ import Levantamiento.Registro;
             return true;
         }
 
-
-
         @Override
         public void onBackPressed() {
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            if (drawer.isDrawerOpen(GravityCompat.START)) {
-                drawer.closeDrawer(GravityCompat.START);
-            } else {
-                super.onBackPressed();
-            }
+
         }
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
 
             int id = item.getItemId();
-
-            //noinspection SimplifiableIfStatement
-      /*  if (id == R.id.action_settings) {
-            return true;
-        }*/
 
             return super.onOptionsItemSelected(item);
         }
@@ -143,9 +137,52 @@ import Levantamiento.Registro;
                 // Handle the camera action
             }
 
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
+            //DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            //drawer.closeDrawer(GravityCompat.START);
             return true;
+        }
+
+        private void leerRespuestas(){
+
+           // layout = (LinearLayout)findViewById(R.id.linearLayout);
+
+            int count = listaQuestion.getChildCount();
+            Historico Historicohelper = new Historico(LevantamientoActivity.this,"tbl_Historico", null,1);
+            SQLiteDatabase db = Historicohelper.getWritableDatabase();
+
+            try {
+            for (int i = 0; i < count; i++) {
+              //Generamos los datos
+                View row = (View) listaQuestion.getChildAt(i);
+
+                TextView tvNombre = (TextView) row.findViewById(R.id.name);
+                EditText editText = (EditText) row.findViewById(R.id.id);
+
+                String tNombre = tvNombre.getText().toString();
+                String eId = editText.getText().toString();
+
+                Log.d("Entra en el for", "Mensage");
+                Log.d("TEXT",tvNombre.getText().toString());
+                Log.d("EDIT", editText.getText().toString());
+
+                //Si hemos abierto correctamente la base de datos
+
+                //Insertamos los datos en la tabla Usuarios
+                db.execSQL("INSERT INTO tbl_Historico (id, name) " + "VALUES ('" + eId + "', '" + tNombre + "')");
+
+            }
+                db.execSQL("SELECT * FROM tbl_Historico");
+                Log.e("SQL", db.toString());
+            //Cerramos la base de datos
+            db.close();
+
+            }catch (Exception e){
+
+                e.printStackTrace();
+
+            }
+
+
         }
 
         //HILO PARA CARGAR LOS DATOS EN EL LISTVIEW
@@ -233,12 +270,9 @@ import Levantamiento.Registro;
             LayoutInflater lInflater;
             private ArrayList<Question>_listData;
 
-
-
             public AdapterList(Context context, ArrayList<Question> listData) {
                 this._context=context;
                 this._listData=listData;
-               // lInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             }
 
             @Override
@@ -253,42 +287,27 @@ import Levantamiento.Registro;
             public long getItemId(int position) { return position; }
 
             public View getView(int position,View view, ViewGroup parent){
-               ViewHolder holder;
                 if(view==null) {
                     LayoutInflater inflater = (LayoutInflater) this._context
                             .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                   /*view = inflater.inflate(R.layout.elements_list_levantamiento, null);*/
-
-                    holder = new ViewHolder();
                     view = inflater.inflate(R.layout.elements_list_levantamiento, null);
-                    holder.caption = (EditText) view
-                            .findViewById(R.id.id);
-                    view.setTag(holder);
                 }
 
                 Question objprop = (Question) getItem(position);
 
                 TextView tvNombre = (TextView) view.findViewById(R.id.name);
+                /*vNombre.setId(Integer.parseInt(objprop.getId()));*/
                 tvNombre.setText(objprop.getName().toString());
 
-                //EditText txtId = (EditText) view.findViewById(R.id.id);
+                EditText txtId = (EditText) view.findViewById(R.id.id);
+                //txtId.setText(objprop.getId().toString());
 
-               // txtId.setText(objprop.getId().toString());
+                /*Historico Historicohelper = new Historico(LevantamientoActivity.this,"tbl_Historico", null,1);
+                SQLiteDatabase db = Historicohelper.getWritableDatabase();*/
+
                 return view;
             }
 
-
-
-
-
         }
-        class ViewHolder {
-            EditText caption;
-        }
-
-        class ListItem {
-            String caption;
-        }
-
 
     }

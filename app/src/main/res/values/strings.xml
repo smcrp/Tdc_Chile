@@ -6,4 +6,8 @@
 
     <string name="action_settings">Cambiar</string>
     <string name="title_activity_levantamiento">LevantamientoActivity</string>
+    <string name="title_activity_producto_levantamiento">Levantamiento Producto Activity</string>
+
+    <string name="wifi_ssid_label">Network Name</string>
+    <string name="wifi_type_label">Type</string>
 </resources>
