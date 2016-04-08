@@ -7,8 +7,11 @@ import java.util.ArrayList;
  */
 public class Registro {
 
-    private String id;
+    private int id;
+    private int idJson;
     private String name;
+    private int status;
+    private String create;
 
     private ArrayList<Question> questions;
 
@@ -20,11 +23,11 @@ public class Registro {
         this.questions = questions;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -36,12 +39,45 @@ public class Registro {
         this.name = name;
     }
 
-    public Registro(String id, String name, ArrayList<Question> questions) {
+    public int getIdJson() {
+        return idJson;
+    }
+
+    public void setIdJson(int idJson) {
+        this.idJson = idJson;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getCreate() {
+        return create;
+    }
+
+    public void setCreate(String create) {
+        this.create = create;
+    }
+
+    public Registro(int id, String name, ArrayList<Question> questions) {
         this.id = id;
         this.name = name;
         this.questions = questions;
     }
 
+    public Registro(int id, int idJson, String name, int status, String create) {
+        this.id = id;
+        this.idJson = idJson;
+        this.name = name;
+        this.status = status;
+        this.create = create;
+    }
+
     public Registro() {
     }
+
 }

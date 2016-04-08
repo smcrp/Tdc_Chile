@@ -1,26 +1,17 @@
 package Levantamiento;
 
-import android.renderscript.ScriptGroup;
-
-import java.util.ArrayList;
-
 /**
  * Created by Sarah Rengel on 29-03-2016.
  */
 public class Question {
 
-    private String id;
+    private int id;
     private String name;
     private String type;
-    private String idType;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    private int idType;
+    private int idRegistro;
+    private int level;
+    private String answer;
 
     public String getName() {
         return name;
@@ -38,19 +29,61 @@ public class Question {
         this.type = type;
     }
 
-    public String getIdType() {
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getIdType() {
         return idType;
     }
 
-    public void setIdType(String idType) {
+    public void setIdType(int idType) {
         this.idType = idType;
     }
 
-    public Question(String id, String name, String type, String idType) {
+    public int getIdRegistro() {
+        return idRegistro;
+    }
+
+    public void setIdRegistro(int idRegistro) {
+        this.idRegistro = idRegistro;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+
+    public Question(int id, String name, String type, int idType) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.idType = idType;
+    }
+
+    public Question(int id, String name, String type, int idType, int idRegistro, int level, String answer) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.idType = idType;
+        this.idRegistro = idRegistro;
+        this.level = level;
+        this.answer = answer;
     }
 
     public Question() {
