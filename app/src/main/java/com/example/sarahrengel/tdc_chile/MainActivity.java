@@ -58,7 +58,9 @@ public class MainActivity extends ListActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final Intent intent = new Intent(getBaseContext(), LevantamientoActivity.class);
+               /* final Intent intent = new Intent(getBaseContext(), LevantamientoActivity.class);
+                startActivity(intent);*/
+                final Intent intent = new Intent(getBaseContext(), LevantamientoProductoActivity.class);
                 startActivity(intent);
             }
         });
@@ -80,12 +82,23 @@ public class MainActivity extends ListActivity
         db.guardarRegistro(reg);*/
 
         //List<Registro> registros = db.obtenerRegistros();
-        List<Question> preguntas = db.obtenerNombreAntena();
+       /* List<Question> preguntas = db.obtenerNombreAntena();
         db.cerrarBD();
         for (int i = 0; i < preguntas.size(); i++){
             results.add(preguntas.get(i).getAnswer());
+            results.add(String.valueOf(preguntas.get(i).getIdRegistro()));
+            Log.d("Id", String.valueOf(preguntas.get(i).getId()));
         }
+        mostrarResultRegistros();
+        */
 
+        List<Question> elementos = db.obtenerElementosdeTorre();
+        db.cerrarBD();
+        for (int i = 0; i < elementos.size(); i++){
+            results.add(elementos.get(i).getAnswer());
+            results.add(String.valueOf(elementos.get(i).getIdRegistro()));
+            Log.d("Id", String.valueOf(elementos.get(i).getId()));
+        }
         mostrarResultRegistros();
 
     }
@@ -96,8 +109,9 @@ public class MainActivity extends ListActivity
 
     private void mostrarResultRegistros() {
         TextView tView = new TextView(this);
-        tView.setText("Registros");//titulo del main (registro)
+        tView.setText("Registros creados");//titulo del main (registro)
         getListView().addHeaderView(tView);
+
 
         setListAdapter(new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, results));

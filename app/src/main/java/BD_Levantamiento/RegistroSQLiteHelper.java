@@ -200,7 +200,7 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
      * */
     public List<Question> obtenerNombreAntena() {
         List<Question> preguntas = new ArrayList<>();
-        String selectQuery = "SELECT " + ANSWER + " FROM " + TABLE_PREGUNTA
+        String selectQuery = "SELECT * FROM " + TABLE_PREGUNTA
                 + " WHERE " + LEVEL + " = 1 AND " + ID_JSON + " = 20 ";
 
         Log.e(LOG, selectQuery);
@@ -212,13 +212,36 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
             do {
                 Question pregunta = new Question();
                 pregunta.setAnswer(c.getString(c.getColumnIndex(ANSWER)));
+                pregunta.setIdRegistro(c.getInt(c.getColumnIndex(ID_REGISTRO)));
                 preguntas.add(pregunta);
             } while (c.moveToNext());
         }
         return preguntas;
     }
 
+    /**
+     * Obtenemos Nombres de las antenas
+     * */
+    public List<Question> obtenerElementosdeTorre() {
+        List<Question> elementos = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_PREGUNTA
+                + " WHERE " + LEVEL + " = 2 AND " + ID_JSON + " = 3 ";
 
+        Log.e(LOG, selectQuery);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+            do {
+                Question elemento = new Question();
+                elemento.setAnswer(c.getString(c.getColumnIndex(ANSWER)));
+                elemento.setIdRegistro(c.getInt(c.getColumnIndex(ID_REGISTRO)));
+                elementos.add(elemento);
+            } while (c.moveToNext());
+        }
+        return elementos;
+    }
 
     /**
      * Actualizamos registro de Antena

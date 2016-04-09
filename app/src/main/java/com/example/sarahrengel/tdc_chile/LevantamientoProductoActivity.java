@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -52,6 +53,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import BD_Levantamiento.RegistroSQLiteHelper;
 import Connection.HttpClient;
 import Connection.OnHttpRequestComplete;
 import Connection.Response;
@@ -72,6 +74,7 @@ public class LevantamientoProductoActivity extends AppCompatActivity
     private JSONArray jsonQuest = null;
     private JSONObject jsono = null;
     AdapterList adapter;
+    private RegistroSQLiteHelper db;
     ArrayList<Question> arrquest;
     ArrayList<Registro> arrregs;
     private ImageView imageView;
@@ -101,6 +104,19 @@ public class LevantamientoProductoActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                leerRespuestas();
+                db.guardarRegistro(registro);
+                 final Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                    startActivity(intent);
+            }
+        });
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -116,8 +132,6 @@ public class LevantamientoProductoActivity extends AppCompatActivity
             }
         });
         client.excecute(URL_PRODUCTO);
-
-
     }
 
     @Override
@@ -168,22 +182,18 @@ public class LevantamientoProductoActivity extends AppCompatActivity
         @Override
         protected Boolean doInBackground(Response... params) {
             param = new ArrayList();
-            boolean resultado = true;
             arrregs = new ArrayList<Registro>();
 
             try {
-
                 jsono = new JSONObject(params[0].getResult());
                 jsonArray = jsono.getJSONArray("result");
 
-                ArrayList<Question> arrayQuestions = new ArrayList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     registro = new Registro();
                     JSONObject c = jsonArray.getJSONObject(i);
 
                     registro.setId(c.getInt("id"));
                     registro.setName(c.getString("name"));
-
 
                     jsonQuest = c.getJSONArray("questions");
                     arrquest = new ArrayList<Question>();
@@ -193,35 +203,28 @@ public class LevantamientoProductoActivity extends AppCompatActivity
                     for (int j = 0; j < jsonQuest.length(); j++) {
                         Question question = new Question();
                         JSONObject l = jsonQuest.getJSONObject(j);
-                        Log.d("IDQ", l.getString("id"));
                         question.setId(l.getInt("id"));
                         question.setName(l.getString("name"));
                         question.setType(l.getString("type"));
                         question.setIdType(l.getInt("idtype"));
+                        question.setLevel(2);
 
-                        Log.d("Id type:::::", l.getString("name"));
+                        Log.d("IDQ", l.getString("id"));
+                        Log.d("INAME:", l.getString("name"));
                         arrquest.add(question);
                     }
                     registro.setQuestions(arrquest);
-                    arrregs.add(registro);
-                    resultado = true;
-                        /*Question ant = gson.fromJson(antena, Question.class);
-                        TextView t = new TextView(getBaseContext());
-                        t.setText(ant.getNameAntena());
-                        StackContent.addView(t);*/
+                   // arrregs.add(registro);
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return resultado;
+            return true;
         }
-
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
         }
 
         @Override
@@ -233,19 +236,16 @@ public class LevantamientoProductoActivity extends AppCompatActivity
                 Log.e("Error", "ERROR de JSON");
             }
         }
-
     }
 
     public class AdapterList extends BaseAdapter {
 
         private final Context _context;
-        LayoutInflater lInflater;
         private ArrayList<Question> _listData;
 
         public AdapterList(Context context, ArrayList<Question> listData) {
             this._context = context;
             this._listData = listData;
-            // lInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         @Override
@@ -264,17 +264,12 @@ public class LevantamientoProductoActivity extends AppCompatActivity
         }
 
         public View getView(int position, View view, ViewGroup parent) {
-            ViewHolder holder;
+
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) this._context
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-                holder = new ViewHolder();
                 view = inflater.inflate(R.layout.elements_list_levantamiento_productos, null);
-                holder.caption = (EditText) view.findViewById(R.id.id);
-                view.setTag(holder);
             }
-
             Question objprop = (Question) getItem(position);
 
             TextView tvNombre = (TextView) view.findViewById(R.id.name);
@@ -285,14 +280,13 @@ public class LevantamientoProductoActivity extends AppCompatActivity
             photo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //aqui
                     selectImage();
                 }
             });
 
             id = (EditText) view.findViewById(R.id.id);
-            idqr = (EditText) view.findViewById(R.id.idQr);
 
+            idqr = (EditText) view.findViewById(R.id.idQr);
             ImageButton qr = (ImageButton) view.findViewById(R.id.qr);
             qr.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -301,35 +295,67 @@ public class LevantamientoProductoActivity extends AppCompatActivity
                 }
             });
 
+            EditText tvNum = (EditText) view.findViewById(R.id.idNum);
+
             id.setVisibility(View.GONE);
             idqr.setVisibility(View.GONE);
             photo.setVisibility(View.GONE);
             qr.setVisibility(View.GONE);
+            tvNum.setVisibility(View.GONE);
 
             if (objprop.getType().equalsIgnoreCase("PHOTO")) {
                 photo.setVisibility(View.VISIBLE);
             } else if (objprop.getType().equalsIgnoreCase("QR")) {
                 qr.setVisibility(View.VISIBLE);
+                idqr.setVisibility(View.GONE);
+
+            } else if (objprop.getType().equalsIgnoreCase("NUM")) {
+                tvNum.setVisibility(View.VISIBLE);
+                //tvNum.setText("Ingrese numero");
 
             } else {
                 id.setVisibility(View.VISIBLE);
             }
-
             return view;
+        }
+    }
+    private void leerRespuestas(){
+        int count = listaQuestion.getChildCount();
+        db = new RegistroSQLiteHelper(getApplicationContext());
+        int id_registro = db.obtenerUltIdRegistro();
+        try {
+            for (int i = 0; i < count; i++) {
+                View row = (View) listaQuestion.getChildAt(i);
+                TextView tvNombre = (TextView) row.findViewById(R.id.name);
+                EditText editText = (EditText) row.findViewById(R.id.id);
+
+                String tNombre = tvNombre.getText().toString();
+                String eId = editText.getText().toString();
+
+                Log.d("Entra en el for", "Mensage");
+                Log.d("TEXT", tvNombre.getText().toString());
+                Log.d("EDIT", editText.getText().toString());
+                Log.d("EDITREGIS", registro.getQuestions().get(i).getName());
+
+                registro.getQuestions().get(i).setAnswer(editText.getText().toString());
+                registro.getQuestions().get(i).setIdRegistro(id_registro);
+            }
+            Log.d("REGISTRO", String.valueOf(registro.getId()));
+            Log.d("REGISTRO", String.valueOf(registro.getName()));
+
+            for (int i = 0; i < registro.getQuestions().size(); i++){
+                Log.d("RESP", String.valueOf(registro.getQuestions().get(i).getId()));
+                Log.d("RESP", String.valueOf(registro.getQuestions().get(i).getIdRegistro()));
+                Log.d("RESP", String.valueOf(registro.getQuestions().get(i).getAnswer()));
+            }
+
+        }catch (Exception e) {
+            Log.e("Servicio Rest", "Error!", e);
         }
 
     }
 
-    class ViewHolder {
-        EditText caption;
-    }
-
-    class ListItem {
-        String caption;
-    }
-
     public void callZXing(View view) {
-
         Intent it = new Intent(LevantamientoProductoActivity.this, com.google.zxing.client.android.CaptureActivity.class);
         Log.e("callZXing", "Se Inicio el Lector");
         startActivityForResult(it, REQUEST_CODE);
@@ -340,32 +366,26 @@ public class LevantamientoProductoActivity extends AppCompatActivity
     private void selectImage() {
 
         final CharSequence[] options = {"Nueva Foto", "Cancelar"};
-
         AlertDialog.Builder builder = new AlertDialog.Builder(LevantamientoProductoActivity.this);
         builder.setTitle("Agregar Foto");
 
         builder.setItems(options, new DialogInterface.OnClickListener() {
-
             @Override
             public void onClick(DialogInterface dialog, int item) {
 
                 if (options[item].equals("Nueva Foto")){
-
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                     File f = new File(android.os.Environment.getExternalStorageDirectory(), "img_"+ timeStamp +".jpg"); //ruta y nombre de la foto
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-                    //pic = f;
                     startActivityForResult(intent, 1);
 
                 }  else if (options[item].equals("Cancelar")) {
-
                     dialog.dismiss();
                 }
             }
         });
         builder.show();
-
     }
 
     public int numeroAleatorio() {
@@ -379,8 +399,8 @@ public class LevantamientoProductoActivity extends AppCompatActivity
         if (REQUEST_CODE == requestCode && RESULT_OK == resultCode) {
             Log.e("onActivityResult", "RESULTADO: " + data.getStringExtra("SCAN_RESULT"));
             //CodeQR = data.getStringExtra("SCAN_RESULT");
-            idqr.setVisibility(View.VISIBLE);
             idqr.setText(data.getStringExtra("SCAN_RESULT"));
+            Log.d("onActivityResult","RESULTADO EN EL EDIT" +idqr.getText());
         }
 
 
