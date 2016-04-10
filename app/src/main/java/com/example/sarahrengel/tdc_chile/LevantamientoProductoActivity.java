@@ -85,7 +85,6 @@ public class LevantamientoProductoActivity extends AppCompatActivity
 
     private static final String URL_PRODUCTO = "http://186.103.141.44/TorresUnidas.com.Api/index.php/api/Levantamiento/QuestionProduct";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,7 +104,6 @@ public class LevantamientoProductoActivity extends AppCompatActivity
         toggle.syncState();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,7 +126,6 @@ public class LevantamientoProductoActivity extends AppCompatActivity
                     Log.e("onComplete", "Status: " + status.toString());
                     new CargarListTask().execute(status);
                 }
-
             }
         });
         client.excecute(URL_PRODUCTO);
@@ -319,6 +316,7 @@ public class LevantamientoProductoActivity extends AppCompatActivity
             return view;
         }
     }
+
     private void leerRespuestas(){
         int count = listaQuestion.getChildCount();
         db = new RegistroSQLiteHelper(getApplicationContext());
@@ -373,14 +371,14 @@ public class LevantamientoProductoActivity extends AppCompatActivity
             @Override
             public void onClick(DialogInterface dialog, int item) {
 
-                if (options[item].equals("Nueva Foto")){
+                if (options[item].equals("Nueva Foto")) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-                    File f = new File(android.os.Environment.getExternalStorageDirectory(), "img_"+ timeStamp +".jpg"); //ruta y nombre de la foto
+                    File f = new File(android.os.Environment.getExternalStorageDirectory(), "img_" + timeStamp + ".jpg"); //ruta y nombre de la foto
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
                     startActivityForResult(intent, 1);
 
-                }  else if (options[item].equals("Cancelar")) {
+                } else if (options[item].equals("Cancelar")) {
                     dialog.dismiss();
                 }
             }

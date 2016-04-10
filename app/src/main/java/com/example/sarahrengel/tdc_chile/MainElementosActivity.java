@@ -4,51 +4,35 @@ import android.app.FragmentManager;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import BD_Levantamiento.HistoricoSQLiteHelper;
 import BD_Levantamiento.RegistroSQLiteHelper;
-import Connection.HttpClient;
-import Connection.OnHttpRequestComplete;
-import Connection.Response;
 import Fragmentos.Fragment1;
 import Levantamiento.Question;
 import Levantamiento.Registro;
 
-public class MainActivity extends ListActivity
+public class MainElementosActivity extends ListActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private LinearLayout StackContent;
@@ -131,7 +115,7 @@ public class MainActivity extends ListActivity
                 String i = listaantenas.get(position).get(TAG_IDANTENA);
                 String e = listaantenas.get(position).get(TAG_DNIANTENA);
 
-                Toast.makeText(MainActivity.this, i, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainElementosActivity.this, i, Toast.LENGTH_SHORT).show();
 
                 Bundle bundle = new Bundle();
                 bundle.putString("posicion", i);
@@ -201,7 +185,7 @@ public class MainActivity extends ListActivity
         tView.setText("Registros creados");//titulo del main (registro)
         getListView().addHeaderView(tView);
 
-        adapterList3 = new AdapterList3(MainActivity.this,listaantenas);
+        adapterList3 = new AdapterList3(MainElementosActivity.this,listaantenas);
         //lista.setAdapter(adapterList3);
         antenas.setAdapter(adapterList3);
 
