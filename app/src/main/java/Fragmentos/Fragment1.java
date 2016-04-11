@@ -13,8 +13,13 @@ import android.widget.TextView;
 
 import com.example.sarahrengel.tdc_chile.LevantamientoActivity;
 import com.example.sarahrengel.tdc_chile.LevantamientoProductoActivity;
+import com.example.sarahrengel.tdc_chile.LevantamientoProductoCableadoActivity;
 import com.example.sarahrengel.tdc_chile.MainActivity;
 import com.example.sarahrengel.tdc_chile.R;
+import com.google.gson.Gson;
+
+import BD_Levantamiento.RegistroSQLiteHelper;
+import Levantamiento.Registro;
 
 
 public class Fragment1 extends DialogFragment implements DialogInterface.OnClickListener {
@@ -22,24 +27,55 @@ public class Fragment1 extends DialogFragment implements DialogInterface.OnClick
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         final View view = getActivity().getLayoutInflater().inflate(R.layout.activity_fragment1, null);
 
         alertDialogBuilder.setView(view);
 
         String nombre_antena = getArguments().getString("nombre");
         alertDialogBuilder.setTitle("TORRE");
-
         //TextView texto = (TextView) view.findViewById(R.id.posicion);
 
-        String strtext = getArguments().getString("posicion");
 
         Button agregar = (Button)view.findViewById(R.id.btn_agregar);
-        agregar.setOnClickListener(new View.OnClickListener() {
+            agregar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dismiss();
+                    //final Intent intent = new Intent(((MainActivity)getActivity()).getBaseContext(), LevantamientoProductoActivity.class);
+                    final Intent intent = new Intent(((MainActivity)getActivity()).getBaseContext(), LevantamientoProductoCableadoActivity.class);
+                    intent.putExtra("idRegistro", getArguments().getString("posicion"));
+                    startActivity(intent);
+                }
+        });
+
+        Button eliminar = (Button)view.findViewById(R.id.btn_eliminar);
+        eliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final Intent intent = new Intent(((MainActivity)getActivity()).getBaseContext(), LevantamientoProductoActivity.class);
-                startActivity(intent);
+
+                Registro registro = new Registro();
+                registro.setId(Integer.parseInt(getArguments().getString("posicion")));
+                RegistroSQLiteHelper db = new RegistroSQLiteHelper(((MainActivity)getActivity()).getBaseContext());
+                db.eliminarRegistro(registro);
+                MainActivity activity = (MainActivity)getActivity();
+                activity.consultarRegistros();
+                activity.mostrarResultRegistros();
+                dismiss();
+
+            }
+        });
+
+        Button enviar = (Button)view.findViewById(R.id.btn_enviar);
+        enviar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                RegistroSQLiteHelper db = new RegistroSQLiteHelper(((MainActivity)getActivity()).getBaseContext());
+                Registro registro = db.obtenerRegistro(Integer.parseInt(getArguments().getString("posicion")));
+
+                Gson gson = new Gson();
+                Log.e("Formato Json arreglo", gson.toJson(registro));
             }
         });
 

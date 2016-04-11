@@ -62,7 +62,8 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
             + TABLE_PREGUNTA + " (" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + ID_JSON + " INTEGER, " + ID_REGISTRO + " INTEGER, " + ID_TYPE + " INTEGER, "
             + NAME + " TEXT, " + TYPE + " TEXT, " + LEVEL + " INTEGER, "
-            + ANSWER + " TEXT " + ")";
+            + ANSWER + " TEXT, " + " FOREIGN KEY(" + ID_REGISTRO + ") REFERENCES "
+            + TABLE_PREGUNTA + "("+ ID +")";
 
     public RegistroSQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -115,7 +116,7 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
         values.put(ID_REGISTRO, pregunta.getIdRegistro());
         values.put(ID_TYPE, pregunta.getIdType());
         values.put(NAME, pregunta.getName());
-        values.put(TYPE, pregunta.getIdType());
+        values.put(TYPE, pregunta.getType());
         values.put(LEVEL, pregunta.getLevel());
         values.put(ANSWER, pregunta.getAnswer());
 
@@ -170,9 +171,36 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
     /**
      * OBTENEMOS TODOS LOS REGISTROS
      * */
-    public List<Registro> obtenerRegistros() {
-        List<Registro> registros = new ArrayList<>();
+    public Registro obtenerRegistro() {
+
         String selectQuery = "SELECT * FROM " + TABLE_REGISTRO;
+
+        Log.e(LOG, selectQuery);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        Registro registro = new Registro();
+        if (c.moveToFirst()) {
+            do {
+                registro.setId(c.getInt(c.getColumnIndex(ID)));
+                registro.setIdJson(c.getInt(c.getColumnIndex(ID_JSON)));
+                registro.setName(c.getString(c.getColumnIndex(NAME)));
+                registro.setStatus(c.getInt(c.getColumnIndex(STATUS)));
+                registro.setCreate(c.getString(c.getColumnIndex(CREATED)));
+            } while (c.moveToNext());
+        }
+
+        return registro;
+    }
+
+    /**
+     * Obtenemos Nombres de las antenas
+     * */
+    public List<Question> obtenerNombreAntenaViejo() {
+        List<Question> preguntas = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_PREGUNTA
+                + " WHERE " + LEVEL + " = 1 AND " + ID_JSON + " = 20 ";
 
         Log.e(LOG, selectQuery);
 
@@ -181,27 +209,25 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
 
         if (c.moveToFirst()) {
             do {
-                Registro registro = new Registro();
-                registro.setId(c.getInt(c.getColumnIndex(ID)));
-                registro.setIdJson(c.getInt(c.getColumnIndex(ID_JSON)));
-                registro.setName(c.getString(c.getColumnIndex(NAME)));
-                registro.setStatus(c.getInt(c.getColumnIndex(STATUS)));
-                registro.setCreate(c.getString(c.getColumnIndex(CREATED)));
-
-                registros.add(registro);
+                Question pregunta = new Question();
+                pregunta.setAnswer(c.getString(c.getColumnIndex(ANSWER)));
+                pregunta.setIdRegistro(c.getInt(c.getColumnIndex(ID_REGISTRO)));
+                preguntas.add(pregunta);
             } while (c.moveToNext());
         }
-
-        return registros;
+        return preguntas;
     }
 
-    /**
-     * Obtenemos Nombres de las antenas
-     * */
     public List<Question> obtenerNombreAntena() {
         List<Question> preguntas = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_PREGUNTA
-                + " WHERE " + LEVEL + " = 1 AND " + ID_JSON + " = 20 ";
+        String selectQuery = "SELECT " + TABLE_PREGUNTA + "." + ID_REGISTRO + ","
+                + TABLE_PREGUNTA + "." + ANSWER + " FROM " + TABLE_REGISTRO
+                + " INNER JOIN " + TABLE_PREGUNTA  + " ON "
+                + TABLE_REGISTRO + "." + ID + " = "
+                + TABLE_PREGUNTA + "." + ID_REGISTRO + " WHERE "
+                + TABLE_PREGUNTA + "." + LEVEL + " = 1 AND "
+                + TABLE_PREGUNTA + "." + ID_JSON + " = 20 AND "
+                + TABLE_REGISTRO + "." + STATUS + " = 1 ";
 
         Log.e(LOG, selectQuery);
 
@@ -240,28 +266,22 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
                 elementos.add(elemento);
             } while (c.moveToNext());
         }
+        cerrarBD();
         return elementos;
     }
 
     /**
-     * Actualizamos registro de Antena
+     * Eliminar Registro
      */
-//    public int actualizarAntena(Antena antena) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//
-//        ContentValues values = new ContentValues();
-//        values.put(NOMBRE, antena.getNombre());
-//        values.put(DIRECCION, antena.getDireccion());
-//        values.put(EMPRESA, antena.getEmpresa());
-//        values.put(IDENTIFICADOR, antena.getIdentificador());
-//        values.put(LATITUD, antena.getLatitud());
-//        values.put(LONGITUD, antena.getLongitud());
-//        values.put(ACTIVO, antena.getActivo());
-//
-//        // actualizando registro
-//        return db.update(TABLE_ANTENA, values, ID + " = ?",
-//                new String[] { String.valueOf(antena.getId()) });
-//    }
+    public void eliminarRegistro(Registro registro){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(STATUS, 0);
+        db.update(TABLE_REGISTRO, values, ID + " = ?",
+                new String[]{String.valueOf(registro.getId())});
+        cerrarBD();
+    }
+
 
     // Cerramos BD
     public void cerrarBD() {

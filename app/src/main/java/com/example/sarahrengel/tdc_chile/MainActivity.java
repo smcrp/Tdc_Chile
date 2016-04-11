@@ -68,17 +68,18 @@ public class MainActivity extends ListActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
        // setSupportActionBar(toolbar);
-        listaantenas = new ArrayList<HashMap<String, String>>();
         antenas = (ListView)findViewById(R.id.list_antena);
         db = new RegistroSQLiteHelper(getApplicationContext());
-
+        /*Registro registro = new Registro();
+        registro.setId(2);
+        db.eliminarRegistro(registro);*/
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               final Intent intent = new Intent(getBaseContext(), LevantamientoActivity.class);
+                Intent intent = new Intent(getBaseContext(), LevantamientoActivity.class);
                 startActivity(intent);
-                 /*final Intent intent = new Intent(getBaseContext(), LevantamientoProductoActivity.class);
+                /*Intent intent = new Intent(getBaseContext(), LevantamientoProductoActivity.class);
                 startActivity(intent);*/
             }
         });
@@ -94,35 +95,8 @@ public class MainActivity extends ListActivity
 
         StackContent = (LinearLayout) findViewById(R.id.StackContent);
 
-        /*Registro reg = new Registro();
-        reg.setId(1);
-        reg.setName("Registro Prueba");
-        db.guardarRegistro(reg);*/
-
-        //List<Registro> registros = db.obtenerRegistros();
-        List<Question> preguntas = db.obtenerNombreAntena();
-        db.cerrarBD();
-        for (int i = 0; i < preguntas.size(); i++){
-            //results.add(preguntas.get(i).getAnswer());
-            String id = String.valueOf(preguntas.get(i).getIdRegistro());
-            String Answer = preguntas.get(i).getAnswer();
-
-            HashMap map = new HashMap();
-            map.put(TAG_IDANTENA, id);
-            map.put(TAG_DNIANTENA, Answer);
-
-            listaantenas.add(map);
-        }
+        consultarRegistros();
         mostrarResultRegistros();
-
-      /*  List<Question> elementos = db.obtenerElementosdeTorre();
-        db.cerrarBD();
-        for (int i = 0; i < elementos.size(); i++){
-            results.add(elementos.get(i).getAnswer());
-            results.add(String.valueOf(elementos.get(i).getIdRegistro()));
-            Log.d("Id", String.valueOf(elementos.get(i).getId()));
-        }
-        mostrarResultRegistros();*/
 
         antenas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -191,20 +165,32 @@ public class MainActivity extends ListActivity
         }
     };
 
-
     protected void onPause(){
         super.onPause();
     }
 
-    private void mostrarResultRegistros() {
+    public void consultarRegistros() {
+        List<Question> preguntas = db.obtenerNombreAntena();
+        listaantenas = new ArrayList<HashMap<String, String>>();
+        for (int i = 0; i < preguntas.size(); i++){
+            String id = String.valueOf(preguntas.get(i).getIdRegistro());
+            String Answer = preguntas.get(i).getAnswer();
+
+            HashMap map = new HashMap();
+            map.put(TAG_IDANTENA, id);
+            map.put(TAG_DNIANTENA, Answer);
+
+            listaantenas.add(map);
+        }
+    }
+
+    public void mostrarResultRegistros() {
         TextView tView = new TextView(this);
         tView.setText("Registros creados");//titulo del main (registro)
         getListView().addHeaderView(tView);
 
         adapterList3 = new AdapterList3(MainActivity.this,listaantenas);
-        //lista.setAdapter(adapterList3);
         antenas.setAdapter(adapterList3);
-
     }
 
     @Override

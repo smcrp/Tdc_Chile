@@ -22,6 +22,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -67,23 +68,19 @@ public class LevantamientoProductoActivity extends AppCompatActivity
 
     private ListView listaQuestion;
     private Registro registro;
-
-    ArrayList<HashMap<String, String>> antenalist;
-    List param;
     private JSONArray jsonArray = null;
     private JSONArray jsonQuest = null;
     private JSONObject jsono = null;
-    AdapterList adapter;
+    private AdapterList adapter;
     private RegistroSQLiteHelper db;
-    ArrayList<Question> arrquest;
-    ArrayList<Registro> arrregs;
-    private ImageView imageView;
+    private ArrayList<Question> arrquest;
     public static final int REQUEST_CODE = 0;
 
-    EditText id;
-    EditText idqr;
+    private EditText id;
+    private EditText idqr;
 
     private static final String URL_PRODUCTO = "http://186.103.141.44/TorresUnidas.com.Api/index.php/api/Levantamiento/QuestionProduct";
+    private String codeQR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +92,6 @@ public class LevantamientoProductoActivity extends AppCompatActivity
 
         listaQuestion = (ListView) findViewById(R.id.listview);
         listaQuestion.setItemsCanFocus(true);
-        new CargarListTask().execute();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -109,9 +105,9 @@ public class LevantamientoProductoActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 leerRespuestas();
-                db.guardarRegistro(registro);
-                 final Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                    startActivity(intent);
+                /*db.guardarRegistro(registro);
+                Intent intent = new Intent(getBaseContext(), MainElementosActivity.class);
+                startActivity(intent);*/
             }
         });
 
@@ -126,6 +122,7 @@ public class LevantamientoProductoActivity extends AppCompatActivity
                     Log.e("onComplete", "Status: " + status.toString());
                     new CargarListTask().execute(status);
                 }
+
             }
         });
         client.excecute(URL_PRODUCTO);
@@ -150,7 +147,6 @@ public class LevantamientoProductoActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
       /*  if (id == R.id.action_settings) { return true;
@@ -178,9 +174,6 @@ public class LevantamientoProductoActivity extends AppCompatActivity
 
         @Override
         protected Boolean doInBackground(Response... params) {
-            param = new ArrayList();
-            arrregs = new ArrayList<Registro>();
-
             try {
                 jsono = new JSONObject(params[0].getResult());
                 jsonArray = jsono.getJSONArray("result");
@@ -205,13 +198,9 @@ public class LevantamientoProductoActivity extends AppCompatActivity
                         question.setType(l.getString("type"));
                         question.setIdType(l.getInt("idtype"));
                         question.setLevel(2);
-
-                        Log.d("IDQ", l.getString("id"));
-                        Log.d("INAME:", l.getString("name"));
                         arrquest.add(question);
                     }
                     registro.setQuestions(arrquest);
-                   // arrregs.add(registro);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -229,6 +218,7 @@ public class LevantamientoProductoActivity extends AppCompatActivity
             if (aBoolean == true) {
                 adapter = new AdapterList(LevantamientoProductoActivity.this, registro.getQuestions());
                 listaQuestion.setAdapter(adapter);
+                callZXing();
             } else {
                 Log.e("Error", "ERROR de JSON");
             }
@@ -283,35 +273,28 @@ public class LevantamientoProductoActivity extends AppCompatActivity
 
             id = (EditText) view.findViewById(R.id.id);
 
-            idqr = (EditText) view.findViewById(R.id.idQr);
             ImageButton qr = (ImageButton) view.findViewById(R.id.qr);
-            qr.setOnClickListener(new View.OnClickListener() {
+            /*qr.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    callZXing(v);
+                    callZXing();
                 }
-            });
-
-            EditText tvNum = (EditText) view.findViewById(R.id.idNum);
+            });*/
 
             id.setVisibility(View.GONE);
-            idqr.setVisibility(View.GONE);
             photo.setVisibility(View.GONE);
             qr.setVisibility(View.GONE);
-            tvNum.setVisibility(View.GONE);
 
             if (objprop.getType().equalsIgnoreCase("PHOTO")) {
                 photo.setVisibility(View.VISIBLE);
             } else if (objprop.getType().equalsIgnoreCase("QR")) {
                 qr.setVisibility(View.VISIBLE);
-                idqr.setVisibility(View.GONE);
-
             } else if (objprop.getType().equalsIgnoreCase("NUM")) {
-                tvNum.setVisibility(View.VISIBLE);
-                //tvNum.setText("Ingrese numero");
-
-            } else {
                 id.setVisibility(View.VISIBLE);
+                id.setInputType(InputType.TYPE_CLASS_NUMBER);
+            } else if (objprop.getType().equalsIgnoreCase("TEXT")) {
+                id.setVisibility(View.VISIBLE);
+                id.setInputType(InputType.TYPE_CLASS_TEXT);
             }
             return view;
         }
@@ -320,32 +303,33 @@ public class LevantamientoProductoActivity extends AppCompatActivity
     private void leerRespuestas(){
         int count = listaQuestion.getChildCount();
         db = new RegistroSQLiteHelper(getApplicationContext());
-        int id_registro = db.obtenerUltIdRegistro();
+
+        Intent intent = getIntent();
+        String id_registro = intent.getStringExtra("idRegistro");
         try {
+            Log.d("************ID REGIS: ", id_registro);
+            Log.d("************CODIGO QR: ", codeQR);
             for (int i = 0; i < count; i++) {
                 View row = (View) listaQuestion.getChildAt(i);
                 TextView tvNombre = (TextView) row.findViewById(R.id.name);
                 EditText editText = (EditText) row.findViewById(R.id.id);
 
-                String tNombre = tvNombre.getText().toString();
-                String eId = editText.getText().toString();
+                Log.d("**TITULO ****", tvNombre.getText().toString());
+                Log.d("**EDIT", editText.getText().toString());
 
-                Log.d("Entra en el for", "Mensage");
-                Log.d("TEXT", tvNombre.getText().toString());
-                Log.d("EDIT", editText.getText().toString());
                 Log.d("EDITREGIS", registro.getQuestions().get(i).getName());
 
-                registro.getQuestions().get(i).setAnswer(editText.getText().toString());
-                registro.getQuestions().get(i).setIdRegistro(id_registro);
+                //registro.getQuestions().get(i).setAnswer(editText.getText().toString());
+                //registro.getQuestions().get(i).setIdRegistro(id_registro);
             }
-            Log.d("REGISTRO", String.valueOf(registro.getId()));
-            Log.d("REGISTRO", String.valueOf(registro.getName()));
+            //Log.d("REGISTRO", String.valueOf(registro.getId()));
+            //Log.d("REGISTRO", String.valueOf(registro.getName()));
 
-            for (int i = 0; i < registro.getQuestions().size(); i++){
+            /*for (int i = 0; i < registro.getQuestions().size(); i++){
                 Log.d("RESP", String.valueOf(registro.getQuestions().get(i).getId()));
                 Log.d("RESP", String.valueOf(registro.getQuestions().get(i).getIdRegistro()));
                 Log.d("RESP", String.valueOf(registro.getQuestions().get(i).getAnswer()));
-            }
+            }*/
 
         }catch (Exception e) {
             Log.e("Servicio Rest", "Error!", e);
@@ -353,12 +337,17 @@ public class LevantamientoProductoActivity extends AppCompatActivity
 
     }
 
-    public void callZXing(View view) {
-        Intent it = new Intent(LevantamientoProductoActivity.this, com.google.zxing.client.android.CaptureActivity.class);
-        Log.e("callZXing", "Se Inicio el Lector");
-        startActivityForResult(it, REQUEST_CODE);
-        Log.e("callZXing", "Obteniendo Parameteros!");
-
+    public void callZXing() {
+        try {
+            Intent it = new Intent(LevantamientoProductoActivity.this, com.google.zxing.client.android.CaptureActivity.class);
+            Log.e("callZXing", "Se Inicio el Lector");
+            startActivityForResult(it, REQUEST_CODE);
+            Log.e("callZXing", "Obteniendo Parameteros!");
+        } catch (Exception e) {
+            Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+            Intent marketIntent = new Intent(Intent.ACTION_VIEW,marketUri);
+            startActivity(marketIntent);
+        }
     }
 
     private void selectImage() {
@@ -370,14 +359,12 @@ public class LevantamientoProductoActivity extends AppCompatActivity
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-
                 if (options[item].equals("Nueva Foto")) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                     File f = new File(android.os.Environment.getExternalStorageDirectory(), "img_" + timeStamp + ".jpg"); //ruta y nombre de la foto
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
                     startActivityForResult(intent, 1);
-
                 } else if (options[item].equals("Cancelar")) {
                     dialog.dismiss();
                 }
@@ -386,24 +373,16 @@ public class LevantamientoProductoActivity extends AppCompatActivity
         builder.show();
     }
 
-    public int numeroAleatorio() {
-        return (int) (Math.random() * 40);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         super.onActivityResult(requestCode, resultCode, data);
         if (REQUEST_CODE == requestCode && RESULT_OK == resultCode) {
-            Log.e("onActivityResult", "RESULTADO: " + data.getStringExtra("SCAN_RESULT"));
-            //CodeQR = data.getStringExtra("SCAN_RESULT");
-            idqr.setText(data.getStringExtra("SCAN_RESULT"));
-            Log.d("onActivityResult","RESULTADO EN EL EDIT" +idqr.getText());
+            Log.d("RESULTADO: ", data.getStringExtra("SCAN_RESULT"));
+            codeQR = data.getStringExtra("SCAN_RESULT");
+            Log.d("QR",codeQR);
+        }else {
+            Intent intent = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(intent);
         }
-
-
     }
-
-
-
 }

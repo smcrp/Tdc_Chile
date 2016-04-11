@@ -11,6 +11,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import BD_Levantamiento.RegistroSQLiteHelper;
 import Fragmentos.Fragment1;
+import Fragmentos.FragmentElementos;
 import Levantamiento.Question;
 import Levantamiento.Registro;
 
@@ -39,8 +41,8 @@ public class MainElementosActivity extends ListActivity
     private RegistroSQLiteHelper db;
     private Registro registro;
     private ArrayList<String> results = new ArrayList<String>();
-    ListView antenas;
-    ArrayList<HashMap<String,String>> listaantenas;
+    ListView element;
+    ArrayList<HashMap<String,String>> listaelementos;
     AdapterList3 adapterList3;
     private static final String TAG_IDANTENA = "id";
     private static final String TAG_DNIANTENA = "Answer";
@@ -52,8 +54,8 @@ public class MainElementosActivity extends ListActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
        // setSupportActionBar(toolbar);
-        listaantenas = new ArrayList<HashMap<String, String>>();
-        antenas = (ListView)findViewById(R.id.list_antena);
+        listaelementos = new ArrayList<HashMap<String, String>>();
+        element = (ListView)findViewById(R.id.list_elementos);
         db = new RegistroSQLiteHelper(getApplicationContext());
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -77,14 +79,8 @@ public class MainElementosActivity extends ListActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         StackContent = (LinearLayout) findViewById(R.id.StackContent);
-
-        /*Registro reg = new Registro();
-        reg.setId(1);
-        reg.setName("Registro Prueba");
-        db.guardarRegistro(reg);*/
-
         //List<Registro> registros = db.obtenerRegistros();
-        List<Question> preguntas = db.obtenerNombreAntena();
+       /* List<Question> preguntas = db.obtenerNombreAntena();
         db.cerrarBD();
         for (int i = 0; i < preguntas.size(); i++){
             //results.add(preguntas.get(i).getAnswer());
@@ -97,23 +93,31 @@ public class MainElementosActivity extends ListActivity
 
             listaantenas.add(map);
         }
-        mostrarResultRegistros();
-
-      /*  List<Question> elementos = db.obtenerElementosdeTorre();
-        db.cerrarBD();
-        for (int i = 0; i < elementos.size(); i++){
-            results.add(elementos.get(i).getAnswer());
-            results.add(String.valueOf(elementos.get(i).getIdRegistro()));
-            Log.d("Id", String.valueOf(elementos.get(i).getId()));
-        }
         mostrarResultRegistros();*/
 
-        antenas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        List<Question> elementos = db.obtenerElementosdeTorre();
+        db.cerrarBD();
+        for (int i = 0; i < elementos.size(); i++){
+            //results.add(elementos.get(i).getAnswer());
+            //results.add(String.valueOf(elementos.get(i).getIdRegistro()));
+            String id = String.valueOf(elementos.get(i).getIdRegistro());
+            String Answer = elementos.get(i).getAnswer();
+            Log.d("Id", String.valueOf(elementos.get(i).getId()));
+
+            HashMap map = new HashMap();
+            map.put(TAG_IDANTENA, id);
+            map.put(TAG_DNIANTENA, Answer);
+
+            listaelementos.add(map);
+        }
+        mostrarResultRegistros();
+
+        element.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                String i = listaantenas.get(position).get(TAG_IDANTENA);
-                String e = listaantenas.get(position).get(TAG_DNIANTENA);
+                String i = listaelementos.get(position).get(TAG_IDANTENA);
+                String e = listaelementos.get(position).get(TAG_DNIANTENA);
 
                 Toast.makeText(MainElementosActivity.this, i, Toast.LENGTH_SHORT).show();
 
@@ -122,10 +126,10 @@ public class MainElementosActivity extends ListActivity
                 bundle.putString("nombre", e);
 
                 FragmentManager frm = getFragmentManager();
-                Fragment1 fragment1 = new Fragment1();
-                fragment1.setArguments(bundle);
-                fragment1.show(frm, "alerta");
-                fragment1.setCancelable(false);
+                FragmentElementos fragment2 = new FragmentElementos();
+                fragment2.setArguments(bundle);
+                fragment2.show(frm, "alerta");
+                fragment2.setCancelable(false);
             }
         });
 
@@ -185,9 +189,9 @@ public class MainElementosActivity extends ListActivity
         tView.setText("Registros creados");//titulo del main (registro)
         getListView().addHeaderView(tView);
 
-        adapterList3 = new AdapterList3(MainElementosActivity.this,listaantenas);
+        adapterList3 = new AdapterList3(MainElementosActivity.this,listaelementos);
         //lista.setAdapter(adapterList3);
-        antenas.setAdapter(adapterList3);
+        element.setAdapter(adapterList3);
 
     }
 

@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.sarahrengel.tdc_chile.LevantamientoProductoCableadoActivity"
+    tools:showIn="@layout/activity_levantamiento_producto_cableado">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <!-- Content here -->
+
+    <TextView
+        android:id="@+id/etiqueta_qr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="QR Ingresado"
+        android:textSize="18dp"
+        />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_icon_qr"
+        android:id="@+id/qr" />
+
+    <TextView
+        android:id="@+id/etiqueta_fotografia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fotografía"
+        android:textSize="18dp"
+        />
+
+    <ImageButton
+        android:id="@+id/photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_menu_camera"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_modelo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese modelo"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_modelo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_marca"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese marca"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_marca"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_tipo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese tipo"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_tipo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_tipo_banda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese tipo de banda"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_tipo_banda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_banda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese banda"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_banda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_frecuencia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese frecuencia"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_frecuencia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_eletrical_tilt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese el electrical tilt"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_eletrical_tilt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_luz_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese el ancho de luz horizontal"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_luz_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_luz_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese el ancho de luz vertical"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_luz_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_ganancia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese la ganancia"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_ganancia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_altura_instalacion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese altura de instalacion"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_altura_instalacion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_largo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese el largo"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_largo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_alto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese el alto"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_alto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/etiqueta_profundidad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese la profundidad"
+        android:textSize="18dp"
+        />
+
+    <EditText
+        android:id="@+id/texto_profundidad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

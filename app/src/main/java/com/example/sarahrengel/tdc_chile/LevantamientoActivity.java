@@ -11,6 +11,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -56,8 +58,6 @@ public class LevantamientoActivity extends AppCompatActivity
     private LinearLayout StackContent;
     private Registro registro;
     private RegistroSQLiteHelper db;
-    private ArrayList<HashMap<String, String>> antenalist;
-    private List param;
     private JSONArray jsonArray = null;
     private JSONArray jsonQuest = null;
     private JSONObject jsono = null;
@@ -97,10 +97,10 @@ public class LevantamientoActivity extends AppCompatActivity
             public void onClick(View view) {
                 leerRespuestas();
                 db.guardarRegistro(registro);
-                final Intent intent = new Intent(getBaseContext(), LevantamientoProductoActivity.class);
-                startActivity(intent);
-                   /* final Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                    startActivity(intent);*/
+               /*  final Intent intent = new Intent(getBaseContext(), LevantamientoProductoActivity.class);
+                startActivity(intent);*/
+                   final Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                    startActivity(intent);
             }
         });
 
@@ -139,6 +139,12 @@ public class LevantamientoActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -193,7 +199,7 @@ public class LevantamientoActivity extends AppCompatActivity
                 } else {
                     registro.getQuestions().get(i).setAnswer(editText.getText().toString());
                 }
-                registro.getQuestions().get(i).setIdRegistro(id_registro);
+                registro.getQuestions().get(i).setIdRegistro(id_registro+1);
             }
 
             Log.d("REGISTRO", String.valueOf(registro.getId()));
@@ -256,7 +262,6 @@ public class LevantamientoActivity extends AppCompatActivity
 
         @Override
         protected Boolean doInBackground(Response... params) {
-            param = new ArrayList();
             try {
                 jsono = new JSONObject(params[0].getResult());
                 jsonArray = jsono.getJSONArray("result");
