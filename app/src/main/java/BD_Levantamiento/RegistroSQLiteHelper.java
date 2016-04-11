@@ -122,6 +122,9 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
 
         // INSERT REGISTRO
         db.insert(TABLE_PREGUNTA, null, values);
+
+
+
     }
 
     /**
@@ -174,6 +177,7 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
     public Registro obtenerRegistro() {
 
         String selectQuery = "SELECT * FROM " + TABLE_REGISTRO;
+
 
         Log.e(LOG, selectQuery);
 
@@ -246,9 +250,9 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Obtenemos Nombres de las antenas
+     * Obtenemos Nombres de los productos
      * */
-    public List<Question> obtenerElementosdeTorre() {
+    public List<Question> obtenerElementosdeTorreviejo() {
         List<Question> elementos = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + TABLE_PREGUNTA
                 + " WHERE " + LEVEL + " = 2 AND " + ID_JSON + " = 3 ";
@@ -268,6 +272,34 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
         }
         cerrarBD();
         return elementos;
+    }
+
+    public List<Question> obtenerElementosdeTorre(String idRegistro) {
+        List<Question> preguntas = new ArrayList<>();
+        String selectQuery = "SELECT " + TABLE_PREGUNTA + "." + ID_REGISTRO + ","
+                + TABLE_PREGUNTA + "." + ANSWER + " FROM " + TABLE_REGISTRO
+                + " INNER JOIN " + TABLE_PREGUNTA  + " ON "
+                + TABLE_REGISTRO + "." + ID + " = "
+                + TABLE_PREGUNTA + "." + ID_REGISTRO + " WHERE "
+                + TABLE_PREGUNTA + "." + LEVEL + " = 2 AND "
+                + TABLE_PREGUNTA + "." + ID_JSON + " = 1 AND "
+                + TABLE_PREGUNTA + "." + ID_REGISTRO + " =  " +idRegistro + " AND "
+                + TABLE_REGISTRO + "." + STATUS + " = 1 ";
+
+        Log.e(LOG, selectQuery);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+            do {
+                Question pregunta = new Question();
+                pregunta.setAnswer(c.getString(c.getColumnIndex(ANSWER)));
+                pregunta.setIdRegistro(c.getInt(c.getColumnIndex(ID_REGISTRO)));
+                preguntas.add(pregunta);
+            } while (c.moveToNext());
+        }
+        return preguntas;
     }
 
     /**

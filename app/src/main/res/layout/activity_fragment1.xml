@@ -42,6 +42,14 @@
             android:layout_below="@+id/btn_eliminar"
             android:layout_centerHorizontal="true"/>
 
+        <Button
+            android:id="@+id/btn_ver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ver productos"
+            android:layout_below="@+id/btn_agregar"
+            android:layout_centerHorizontal="true"/>
+
     </RelativeLayout>
 
 

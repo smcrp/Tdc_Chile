@@ -51,7 +51,7 @@ public class MainElementosActivity extends ListActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_elementos_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
        // setSupportActionBar(toolbar);
         listaelementos = new ArrayList<HashMap<String, String>>();
@@ -62,7 +62,7 @@ public class MainElementosActivity extends ListActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               final Intent intent = new Intent(getBaseContext(), LevantamientoActivity.class);
+                final Intent intent = new Intent(getBaseContext(), LevantamientoActivity.class);
                 startActivity(intent);
                  /*final Intent intent = new Intent(getBaseContext(), LevantamientoProductoActivity.class);
                 startActivity(intent);*/
@@ -78,28 +78,16 @@ public class MainElementosActivity extends ListActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+       String idRegistro = getIntent().getStringExtra("idRegistro");
+//        Log.d("PROBANDO ID REGISTRO",idRegistro);
+
         StackContent = (LinearLayout) findViewById(R.id.StackContent);
         //List<Registro> registros = db.obtenerRegistros();
-       /* List<Question> preguntas = db.obtenerNombreAntena();
-        db.cerrarBD();
-        for (int i = 0; i < preguntas.size(); i++){
-            //results.add(preguntas.get(i).getAnswer());
-            String id = String.valueOf(preguntas.get(i).getIdRegistro());
-            String Answer = preguntas.get(i).getAnswer();
 
-            HashMap map = new HashMap();
-            map.put(TAG_IDANTENA, id);
-            map.put(TAG_DNIANTENA, Answer);
-
-            listaantenas.add(map);
-        }
-        mostrarResultRegistros();*/
-
-        List<Question> elementos = db.obtenerElementosdeTorre();
+        List<Question> elementos = db.obtenerElementosdeTorre(idRegistro);
         db.cerrarBD();
         for (int i = 0; i < elementos.size(); i++){
-            //results.add(elementos.get(i).getAnswer());
-            //results.add(String.valueOf(elementos.get(i).getIdRegistro()));
+
             String id = String.valueOf(elementos.get(i).getIdRegistro());
             String Answer = elementos.get(i).getAnswer();
             Log.d("Id", String.valueOf(elementos.get(i).getId()));
@@ -110,29 +98,11 @@ public class MainElementosActivity extends ListActivity
 
             listaelementos.add(map);
         }
-        mostrarResultRegistros();
+        Log.d("Elementos:::: ", String.valueOf(elementos.size()));
 
-        element.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                String i = listaelementos.get(position).get(TAG_IDANTENA);
-                String e = listaelementos.get(position).get(TAG_DNIANTENA);
-
-                Toast.makeText(MainElementosActivity.this, i, Toast.LENGTH_SHORT).show();
-
-                Bundle bundle = new Bundle();
-                bundle.putString("posicion", i);
-                bundle.putString("nombre", e);
-
-                FragmentManager frm = getFragmentManager();
-                FragmentElementos fragment2 = new FragmentElementos();
-                fragment2.setArguments(bundle);
-                fragment2.show(frm, "alerta");
-                fragment2.setCancelable(false);
-            }
-        });
-
+        if (elementos.size() > 0) {
+            mostrarResultRegistros();
+        }
     }
 
     class AdapterList3 extends BaseAdapter {
@@ -168,12 +138,11 @@ public class MainElementosActivity extends ListActivity
             if (convertView == null) {
                 LayoutInflater infalInflater = (LayoutInflater) this.context
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = infalInflater.inflate(R.layout.lista_elementos_antenas, null);
+                convertView = infalInflater.inflate(R.layout.lista_elementos_productos, null);
             }
             final TextView nombre = (TextView)convertView.findViewById(R.id.elem_nombre);
             nombre.setText(Antena.get(position).get(TAG_DNIANTENA));
-            //final TextView idtrabajor = (TextView)convertView.findViewById(R.id.antena_id);
-            //idtrabajor.setText(Antena.get(position).get(TAG_IDANTENA));
+
 
             return convertView;
         }

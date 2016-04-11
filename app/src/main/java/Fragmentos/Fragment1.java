@@ -15,6 +15,7 @@ import com.example.sarahrengel.tdc_chile.LevantamientoActivity;
 import com.example.sarahrengel.tdc_chile.LevantamientoProductoActivity;
 import com.example.sarahrengel.tdc_chile.LevantamientoProductoCableadoActivity;
 import com.example.sarahrengel.tdc_chile.MainActivity;
+import com.example.sarahrengel.tdc_chile.MainElementosActivity;
 import com.example.sarahrengel.tdc_chile.R;
 import com.google.gson.Gson;
 
@@ -43,11 +44,11 @@ public class Fragment1 extends DialogFragment implements DialogInterface.OnClick
                 public void onClick(View view) {
                     dismiss();
                     //final Intent intent = new Intent(((MainActivity)getActivity()).getBaseContext(), LevantamientoProductoActivity.class);
-                    final Intent intent = new Intent(((MainActivity)getActivity()).getBaseContext(), LevantamientoProductoCableadoActivity.class);
+                    final Intent intent = new Intent(((MainActivity) getActivity()).getBaseContext(), LevantamientoProductoCableadoActivity.class);
                     intent.putExtra("idRegistro", getArguments().getString("posicion"));
                     startActivity(intent);
                 }
-        });
+            });
 
         Button eliminar = (Button)view.findViewById(R.id.btn_eliminar);
         eliminar.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +79,21 @@ public class Fragment1 extends DialogFragment implements DialogInterface.OnClick
                 Log.e("Formato Json arreglo", gson.toJson(registro));
             }
         });
+
+
+        Button ver = (Button)view.findViewById(R.id.btn_ver);
+        ver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                final Intent intent = new Intent(((MainActivity) getActivity()).getBaseContext(), MainElementosActivity.class);
+                intent.putExtra("idRegistro", getArguments().getString("posicion"));
+                Log.d("idRegistro", getArguments().getString("posicion"));
+                startActivity(intent);
+
+            }
+        });
+
 
         //texto.setText(strtext);
 

@@ -95,8 +95,8 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 leerRespuestas();
-                /*db.guardarRegistro(registro);
-                Intent intent = new Intent(getBaseContext(), MainElementosActivity.class);
+                // db.guardarRegistro(registro);
+                /*Intent intent = new Intent(getBaseContext(), MainElementosActivity.class);
                 startActivity(intent);*/
             }
         });
