@@ -47,6 +47,7 @@ import Connection.Response;
 import Fragmentos.Fragment1;
 import Levantamiento.Question;
 import Levantamiento.Registro;
+import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 
 public class MainActivity extends ListActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -60,6 +61,7 @@ public class MainActivity extends ListActivity
     AdapterList3 adapterList3;
     private static final String TAG_IDANTENA = "id";
     private static final String TAG_DNIANTENA = "Answer";
+
 
 
     @Override
@@ -124,23 +126,23 @@ public class MainActivity extends ListActivity
     class AdapterList3 extends BaseAdapter {
 
         private Context context;
-        private ArrayList<HashMap<String,String>> Antena;
+        private ArrayList<HashMap<String,String>> antena;
 
         public AdapterList3(Context context, ArrayList<HashMap<String,String>> trabajador){
             super();
             this.context = context;
-            this.Antena = trabajador;
+            this.antena = trabajador;
         }
 
 
         @Override
         public int getCount() {
-            return Antena.size();
+            return antena.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return Antena.get(position);
+            return antena.get(position);
         }
 
         @Override
@@ -157,9 +159,7 @@ public class MainActivity extends ListActivity
                 convertView = infalInflater.inflate(R.layout.lista_elementos_antenas, null);
             }
             final TextView nombre = (TextView)convertView.findViewById(R.id.elem_nombre);
-            nombre.setText(Antena.get(position).get(TAG_DNIANTENA));
-            //final TextView idtrabajor = (TextView)convertView.findViewById(R.id.antena_id);
-            //idtrabajor.setText(Antena.get(position).get(TAG_IDANTENA));
+            nombre.setText(antena.get(position).get(TAG_DNIANTENA));
 
             return convertView;
         }

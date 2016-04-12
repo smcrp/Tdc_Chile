@@ -12,7 +12,12 @@ import android.widget.Button;
 
 import com.example.sarahrengel.tdc_chile.LevantamientoProductoActivity;
 import com.example.sarahrengel.tdc_chile.MainActivity;
+import com.example.sarahrengel.tdc_chile.MainElementosActivity;
 import com.example.sarahrengel.tdc_chile.R;
+
+import BD_Levantamiento.RegistroSQLiteHelper;
+import Levantamiento.Question;
+import Levantamiento.Registro;
 
 
 public class FragmentElementos extends DialogFragment implements DialogInterface.OnClickListener {
@@ -21,26 +26,37 @@ public class FragmentElementos extends DialogFragment implements DialogInterface
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        final View view = getActivity().getLayoutInflater().inflate(R.layout.activity_fragment1, null);
+        final View view = getActivity().getLayoutInflater().inflate(R.layout.activity_fragment_elementos, null);
 
         alertDialogBuilder.setView(view);
+        alertDialogBuilder.setTitle("PRODUCTO");
 
         String nombre_antena = getArguments().getString("nombre");
-        alertDialogBuilder.setTitle("TORRE");
-        //TextView texto = (TextView) view.findViewById(R.id.posicion);
-
         String strtext = getArguments().getString("posicion");
 
-        Button agregar = (Button)view.findViewById(R.id.btn_agregar);
-        agregar.setOnClickListener(new View.OnClickListener() {
+        Button eliminar = (Button)view.findViewById(R.id.btn_eliminar);
+        eliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final Intent intent = new Intent(((MainActivity)getActivity()).getBaseContext(), LevantamientoProductoActivity.class);
-                startActivity(intent);
+                Question pregunta = new Question();
+                pregunta.setId(Integer.parseInt(getArguments().getString("posicion")));
+                RegistroSQLiteHelper db = new RegistroSQLiteHelper(((MainElementosActivity)getActivity()).getBaseContext());
+                db.eliminarPregunta(pregunta);
+                MainElementosActivity activity = (MainElementosActivity)getActivity();
+                activity.consultarRegistros();
+                activity.mostrarResultRegistros();
+                dismiss();
             }
         });
 
-        //texto.setText(strtext);
+        Button editar = (Button)view.findViewById(R.id.btn_editar);
+        editar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
 
         //El botón cerrar
         alertDialogBuilder.setNegativeButton("Cerrar", new DialogInterface.OnClickListener() {

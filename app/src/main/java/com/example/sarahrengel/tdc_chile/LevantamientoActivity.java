@@ -99,8 +99,8 @@ public class LevantamientoActivity extends AppCompatActivity
                 db.guardarRegistro(registro);
                /*  final Intent intent = new Intent(getBaseContext(), LevantamientoProductoActivity.class);
                 startActivity(intent);*/
-                   final Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                    startActivity(intent);
+                final Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -202,13 +202,13 @@ public class LevantamientoActivity extends AppCompatActivity
                 registro.getQuestions().get(i).setIdRegistro(id_registro+1);
             }
 
-            Log.d("REGISTRO", String.valueOf(registro.getId()));
-            Log.d("REGISTRO", String.valueOf(registro.getName()));
+            Log.e("REGISTRO", String.valueOf(registro.getId()));
+            Log.e("REGISTRO", String.valueOf(registro.getName()));
 
             for (int i = 0; i < registro.getQuestions().size(); i++) {
-                Log.d("RESP", String.valueOf(registro.getQuestions().get(i).getId()));
-                Log.d("RESP", String.valueOf(registro.getQuestions().get(i).getIdRegistro()));
-                Log.d("RESP", String.valueOf(registro.getQuestions().get(i).getAnswer()));
+                Log.e("RESP", String.valueOf(registro.getQuestions().get(i).getId()));
+                Log.e("RESP", String.valueOf(registro.getQuestions().get(i).getIdRegistro()));
+                Log.e("RESP", String.valueOf(registro.getQuestions().get(i).getAnswer()));
             }
 
         } catch (Exception e) {

@@ -69,12 +69,9 @@ public class Registro {
         this.questions = questions;
     }
 
-    public Registro(int id, int idJson, String name, int status, String create) {
+    public Registro(int id, String name) {
         this.id = id;
-        this.idJson = idJson;
         this.name = name;
-        this.status = status;
-        this.create = create;
     }
 
     public Registro() {

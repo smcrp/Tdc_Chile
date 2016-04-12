@@ -19,13 +19,31 @@ import com.example.sarahrengel.tdc_chile.MainElementosActivity;
 import com.example.sarahrengel.tdc_chile.R;
 import com.google.gson.Gson;
 
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import BD_Levantamiento.RegistroSQLiteHelper;
+import Levantamiento.Products;
+import Levantamiento.Question;
 import Levantamiento.Registro;
+import Levantamiento.RegistroJson;
+import cz.msebera.android.httpclient.HttpEntity;
+import cz.msebera.android.httpclient.HttpResponse;
+import cz.msebera.android.httpclient.client.HttpClient;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.client.methods.HttpPost;
+import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 
 
 public class Fragment1 extends DialogFragment implements DialogInterface.OnClickListener {
 
 
+
+
+
+    private static final String REGISTER_URL ="http://186.103.141.44/TorresUnidas.com.Api/index.php/api/Levantamiento/productsAntenna";
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
@@ -73,10 +91,44 @@ public class Fragment1 extends DialogFragment implements DialogInterface.OnClick
             public void onClick(View view) {
 
                 RegistroSQLiteHelper db = new RegistroSQLiteHelper(((MainActivity)getActivity()).getBaseContext());
-                Registro registro = db.obtenerRegistro(Integer.parseInt(getArguments().getString("posicion")));
+                RegistroJson registroJson = db.obtenerRegistroJson(Integer.parseInt(getArguments().getString("posicion")));
+                ArrayList<Question> preguntasNivel1 = db.obtenerPreguntaJson(Integer.parseInt(getArguments().getString("posicion")), 1);
 
+                /****CABLEANDO RESPUESTAS (MEJORAR)****/
+                for (Question respuesta: preguntasNivel1) {
+                    if (respuesta.getId()==20){ //nombre de la antena
+                        registroJson.setName(respuesta.getAnswer());
+                    } else if (respuesta.getId()==21){ //direccion
+                        registroJson.setDireccion(respuesta.getAnswer());
+                    } else if (respuesta.getId()==23){ //empresa
+                        registroJson.setEnterprise(respuesta.getAnswer());
+                    } else if (respuesta.getId()==24){ //identificador
+                        registroJson.setIdentificador(respuesta.getAnswer());
+                    } else if (respuesta.getId()==25){ //latitud
+                        registroJson.setCoordx(respuesta.getAnswer());
+                    }  else if (respuesta.getId()==26){ //longitud
+                        registroJson.setCoordy(respuesta.getAnswer());
+                    }
+                }
+
+
+                ArrayList<Question> preguntasNivel2 = db.obtenerPreguntaJson(Integer.parseInt(getArguments().getString("posicion")), 2);
+                ArrayList<Products> products = new ArrayList<Products>();
+                for (Question respuesta: preguntasNivel2) {
+                    Products prod = new Products();
+                    prod.setId(respuesta.getId());
+                    prod.setValue(respuesta.getAnswer());
+                    products.add(prod);
+                }
+                registroJson.setProducts(products);
                 Gson gson = new Gson();
-                Log.e("Formato Json arreglo", gson.toJson(registro));
+                String pruebaenvio = gson.toJson(registroJson);
+                Log.e("Formato Json arreglo", gson.toJson(registroJson));//JSON ARMADO LISTO PARA ENVIAR
+
+                if (pruebaenvio != null){
+                    //llamar la clase
+                }
+                dismiss();
             }
         });
 
@@ -93,7 +145,6 @@ public class Fragment1 extends DialogFragment implements DialogInterface.OnClick
 
             }
         });
-
 
         //texto.setText(strtext);
 

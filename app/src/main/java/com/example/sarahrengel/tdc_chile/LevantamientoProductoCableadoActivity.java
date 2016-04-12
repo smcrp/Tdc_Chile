@@ -94,10 +94,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                leerRespuestas();
-                // db.guardarRegistro(registro);
-                /*Intent intent = new Intent(getBaseContext(), MainElementosActivity.class);
-                startActivity(intent);*/
+                guardarRespuestas();
             }
         });
 
@@ -209,7 +206,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
         }
     }
 
-    private void leerRespuestas(){
+    private void guardarRespuestas(){
         db = new RegistroSQLiteHelper(getApplicationContext());
 
         Intent intent = getIntent();
@@ -411,6 +408,10 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q14.setAnswer(texto_profundidad.getText().toString());//vista
             db.guardarPregunta(q14);
 
+            Intent intentMain = new Intent(LevantamientoProductoCableadoActivity.this, MainElementosActivity.class);
+            intentMain.putExtra("idRegistro", id_registro);
+            startActivity(intentMain);
+
         }catch (Exception e) {
             Log.e("Servicio Rest", "Error!", e);
         }
@@ -463,9 +464,23 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
         } else if(2 == requestCode) {
             Log.d("FOTO","Evaluar foto");
           //  Log.d("RESULTADO: ", data.getStringExtra(MediaStore.EXTRA_OUTPUT));
-        }else {
-            Intent intent = new Intent(getBaseContext(), MainActivity.class);
-            startActivity(intent);
+        } else {
+            Intent intent2 = getIntent();
+            String activityAnterior = intent2.getStringExtra("activityAnterior");
+            if (activityAnterior==null){
+                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(intent);
+            } else if (activityAnterior.equalsIgnoreCase("MainElementosActivity")){
+                String id_registro = intent2.getStringExtra("idRegistro");
+                Intent intent = new Intent(getBaseContext(), MainElementosActivity.class);
+                intent.putExtra("idRegistro", id_registro);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(intent);
+            }
+
+
         }
     }
 }

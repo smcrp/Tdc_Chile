@@ -16,6 +16,7 @@ import java.util.Locale;
 
 import Levantamiento.Question;
 import Levantamiento.Registro;
+import Levantamiento.RegistroJson;
 
 /**
  * Created by georgeperez on 4/4/16.
@@ -63,7 +64,7 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
             + ID_JSON + " INTEGER, " + ID_REGISTRO + " INTEGER, " + ID_TYPE + " INTEGER, "
             + NAME + " TEXT, " + TYPE + " TEXT, " + LEVEL + " INTEGER, "
             + ANSWER + " TEXT, " + " FOREIGN KEY(" + ID_REGISTRO + ") REFERENCES "
-            + TABLE_PREGUNTA + "("+ ID +")";
+            + TABLE_PREGUNTA + "("+ ID +"))";
 
     public RegistroSQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -103,6 +104,7 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
         for (Question preg: registro.getQuestions()) {
             guardarPregunta(preg);
         }
+        cerrarBD();
     }
 
     /**
@@ -122,9 +124,6 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
 
         // INSERT REGISTRO
         db.insert(TABLE_PREGUNTA, null, values);
-
-
-
     }
 
     /**
@@ -145,7 +144,7 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
                 max= cursor.getInt(0);
             }
         }
-        return max+1;
+        return max;
     }
 
     /**
@@ -170,6 +169,73 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
         return registro;
     }
 
+    /**
+     * OBTENEMOS REGISTRO POR ID
+     */
+    public RegistroJson obtenerRegistroJson(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String selectQuery = "SELECT " + ID_JSON + "," + NAME + " FROM " + TABLE_REGISTRO + " WHERE "
+                + ID + " = " + id;
+        Log.e(LOG, selectQuery);
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c != null)
+            c.moveToFirst();
+
+        RegistroJson registroJson = new RegistroJson(c.getInt(c.getColumnIndex(ID_JSON)),c.getString(c.getColumnIndex(NAME)));
+        //registro.setId(c.getInt(c.getColumnIndex(ID)));
+        //registro.setStatus(c.getInt(c.getColumnIndex(STATUS)));
+        //registro.setCreate(c.getString(c.getColumnIndex(CREATED)));
+
+        /*ArrayList<Question> preguntas = new ArrayList<>();
+        String selectQueryPreg = "SELECT * FROM " + TABLE_PREGUNTA
+                + " WHERE " + ID_REGISTRO + " = " + id;
+
+        Log.e(LOG, selectQueryPreg);
+
+        Cursor c2 = db.rawQuery(selectQueryPreg, null);
+
+        if (c2.moveToFirst()) {
+            do {
+                Question pregunta = new Question();
+                pregunta.setId(c2.getInt(c2.getColumnIndex(ID_JSON)));
+                pregunta.setAnswer(c2.getString(c2.getColumnIndex(ANSWER)));
+                preguntas.add(pregunta);
+            } while (c2.moveToNext());
+            registro.setQuestions(preguntas);
+        }*/
+        return registroJson;
+    }
+
+    /**
+     * OBTENEMOS REGISTRO POR ID
+     */
+    public ArrayList<Question> obtenerPreguntaJson(long idRegistro, int lvl) {
+        ArrayList<Question> preguntas = new ArrayList<>();
+        String selectQuery = "SELECT " + TABLE_PREGUNTA + "." + ID_JSON + ","
+                + TABLE_PREGUNTA + "." + ANSWER + " FROM " + TABLE_REGISTRO
+                + " INNER JOIN " + TABLE_PREGUNTA  + " ON "
+                + TABLE_REGISTRO + "." + ID + " = "
+                + TABLE_PREGUNTA + "." + ID_REGISTRO + " WHERE "
+                + TABLE_PREGUNTA + "." + LEVEL + " = " + lvl + " AND "
+                + TABLE_PREGUNTA + "." + ID_REGISTRO + " =  " +idRegistro + " AND "
+                + TABLE_REGISTRO + "." + STATUS + " = 1 ";
+
+        Log.e(LOG, selectQuery);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+            do {
+                Question pregunta = new Question();
+                pregunta.setId(c.getInt(c.getColumnIndex(ID_JSON)));
+                pregunta.setAnswer(c.getString(c.getColumnIndex(ANSWER)));
+                preguntas.add(pregunta);
+            } while (c.moveToNext());
+        }
+        return preguntas;
+    }
 
     /**
      * OBTENEMOS TODOS LOS REGISTROS
@@ -177,7 +243,6 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
     public Registro obtenerRegistro() {
 
         String selectQuery = "SELECT * FROM " + TABLE_REGISTRO;
-
 
         Log.e(LOG, selectQuery);
 
@@ -274,15 +339,15 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
         return elementos;
     }
 
-    public List<Question> obtenerElementosdeTorre(String idRegistro) {
+    public List<Question> obtenerElementosdeTorre(int idRegistro) {
         List<Question> preguntas = new ArrayList<>();
-        String selectQuery = "SELECT " + TABLE_PREGUNTA + "." + ID_REGISTRO + ","
+        String selectQuery = "SELECT " + TABLE_PREGUNTA + "." + ID + ","
                 + TABLE_PREGUNTA + "." + ANSWER + " FROM " + TABLE_REGISTRO
                 + " INNER JOIN " + TABLE_PREGUNTA  + " ON "
                 + TABLE_REGISTRO + "." + ID + " = "
                 + TABLE_PREGUNTA + "." + ID_REGISTRO + " WHERE "
                 + TABLE_PREGUNTA + "." + LEVEL + " = 2 AND "
-                + TABLE_PREGUNTA + "." + ID_JSON + " = 1 AND "
+                + TABLE_PREGUNTA + "." + ID_JSON + " = 3 AND "
                 + TABLE_PREGUNTA + "." + ID_REGISTRO + " =  " +idRegistro + " AND "
                 + TABLE_REGISTRO + "." + STATUS + " = 1 ";
 
@@ -295,7 +360,7 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
             do {
                 Question pregunta = new Question();
                 pregunta.setAnswer(c.getString(c.getColumnIndex(ANSWER)));
-                pregunta.setIdRegistro(c.getInt(c.getColumnIndex(ID_REGISTRO)));
+                pregunta.setId(c.getInt(c.getColumnIndex(ID)));
                 preguntas.add(pregunta);
             } while (c.moveToNext());
         }
@@ -311,6 +376,15 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
         values.put(STATUS, 0);
         db.update(TABLE_REGISTRO, values, ID + " = ?",
                 new String[]{String.valueOf(registro.getId())});
+        cerrarBD();
+    }
+
+    /**
+     * Eliminar Pregunta
+     */
+    public void eliminarPregunta(Question pregunta){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_PREGUNTA, ID +" = " + pregunta.getId(), null);
         cerrarBD();
     }
 

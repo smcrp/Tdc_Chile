@@ -5,12 +5,13 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Cambiar</string>
+    <string name="title_activity_main">Levantamiento</string>
     <string name="title_activity_levantamiento">Torre</string>
     <string name="title_activity_producto_levantamiento">Elementos de la Torre</string>
 
     <string name="wifi_ssid_label">Network Name</string>
     <string name="wifi_type_label">Type</string>
     <string name="title_activity_levantamiento_producto_cableado">
-        LevantamientoProductoCableadoActivity
+        Levantamiento Producto
     </string>
 </resources>

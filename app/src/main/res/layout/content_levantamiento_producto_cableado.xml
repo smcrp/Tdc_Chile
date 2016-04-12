@@ -202,7 +202,8 @@
         android:layout_marginTop="1dp"
         android:layout_below="@+id/name"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:inputType="number"/>
 
     <TextView
         android:id="@+id/etiqueta_luz_vertical"
@@ -221,7 +222,8 @@
         android:layout_marginTop="1dp"
         android:layout_below="@+id/name"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:inputType="number"/>
 
     <TextView
         android:id="@+id/etiqueta_ganancia"
@@ -240,7 +242,8 @@
         android:layout_marginTop="1dp"
         android:layout_below="@+id/name"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:inputType="number"/>
 
     <TextView
         android:id="@+id/etiqueta_altura_instalacion"
@@ -259,7 +262,8 @@
         android:layout_marginTop="1dp"
         android:layout_below="@+id/name"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:inputType="number"/>
 
     <TextView
         android:id="@+id/etiqueta_largo"
@@ -278,7 +282,8 @@
         android:layout_marginTop="1dp"
         android:layout_below="@+id/name"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:inputType="number"/>
 
     <TextView
         android:id="@+id/etiqueta_alto"
@@ -297,7 +302,9 @@
         android:layout_marginTop="1dp"
         android:layout_below="@+id/name"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:inputType="number"
+        />
 
     <TextView
         android:id="@+id/etiqueta_profundidad"

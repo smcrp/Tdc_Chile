@@ -9,7 +9,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.sarahrengel.tdc_chile.MainActivity"
+    tools:context="com.example.sarahrengel.tdc_chile.MainElementosActivity"
     tools:showIn="@layout/app_bar_main">
 
     <ListView
@@ -20,7 +20,7 @@
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/list_elementos"
+        android:id="@+id/list_antena"
         android:layout_below="@id/android:list"
         android:layout_centerHorizontal="true" />
 
