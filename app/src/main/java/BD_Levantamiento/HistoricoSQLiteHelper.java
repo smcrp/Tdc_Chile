@@ -38,24 +38,27 @@ public class HistoricoSQLiteHelper extends SQLiteOpenHelper {
     private static final String EDIT = "name";
 
 
-  // String Sql="CREATE TABLE tbl_Historico (id INTEGER, idN TEXT, name TEXT)";
+    // String Sql="CREATE TABLE tbl_Historico (id INTEGER, idN TEXT, name TEXT)";
     String CREA_TABLA = "CREATE TABLE "
             + "tbl_Historico" + "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + IDENTIFICADOR + " TEXT," + EDIT + " TEXT" + ")";
 
+    String Foto = "CREATE TABLE foto (Ruta TEXT, dnfoto TEXT )";
     public HistoricoSQLiteHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-       db.execSQL(CREA_TABLA);
+        db.execSQL(CREA_TABLA);
+        db.execSQL(Foto);
         Log.e("SE CREA LA BD", "Creada!!!!!!");
     }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-       db.execSQL("DROP TABLE IF EXISTS tbl_Historico");
+        db.execSQL("DROP TABLE IF EXISTS tbl_Historico");
+        db.execSQL("DROP TABLE IF EXISTS foto");
         onCreate(db);
 
     }
@@ -69,15 +72,14 @@ public class HistoricoSQLiteHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(IDENTIFICADOR, registro.getId());
         values.put(EDIT, registro.getName());
-       // values.put(EMPRESA, antena.getEmpresa());
+        // values.put(EMPRESA, antena.getEmpresa());
         //values.put(IDENTIFICADOR, antena.getIdentificador());
-       // values.put(LATITUD, antena.getLatitud());
-       // values.put(LONGITUD, antena.getLongitud());
+        // values.put(LATITUD, antena.getLatitud());
+        // values.put(LONGITUD, antena.getLongitud());
         // INSERT Antena
         db.insert("tbl_Historico", null, values);
-      //  db.execSQL("INSERT INTO tbl_Historico (id, idN, name) " + "VALUES (" + ID + ",'" + IDENTIFICADOR + "', '" + EDIT + "')");
+        //  db.execSQL("INSERT INTO tbl_Historico (id, idN, name) " + "VALUES (" + ID + ",'" + IDENTIFICADOR + "', '" + EDIT + "')");
     }
-
 
     /**
      * Obtenemos todos los registros
@@ -86,7 +88,6 @@ public class HistoricoSQLiteHelper extends SQLiteOpenHelper {
         List<Registro> registros = new ArrayList<>();
 
         String selectQuery = "SELECT * FROM " + "tbl_Historico";
-
         Log.e(LOG, selectQuery);
 
         SQLiteDatabase db = this.getReadableDatabase();

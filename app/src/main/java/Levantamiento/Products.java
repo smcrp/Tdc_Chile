@@ -1,26 +1,31 @@
 package Levantamiento;
 
+import java.util.ArrayList;
+
 /**
  * Created by Sarah Rengel on 11-04-2016.
  */
 public class Products {
-    private int id;
-    private String value;
+    private String idproduct;
+    private ArrayList<Question> questions;
 
-    public int getId() {
-        return id;
+    public Products(int id) {
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String getId() {
+        return idproduct;
     }
 
-    public String getValue() {
-        return value;
+    public void setId(String idproduct) {
+        this.idproduct = idproduct;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public ArrayList<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(ArrayList<Question> questions) {
+        this.questions = questions;
     }
 
     public Products() {

@@ -163,6 +163,7 @@ public class MainElementosActivity extends ListActivity
 
     protected void onPause(){
         super.onPause();
+        finish();
     }
 
     public void consultarRegistros() {
@@ -194,12 +195,12 @@ public class MainElementosActivity extends ListActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+     /*   DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        } else {*/
             super.onBackPressed();
-        }
+     //   }
     }
 
     @Override

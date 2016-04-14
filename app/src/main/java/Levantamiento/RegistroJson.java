@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 public class RegistroJson {
     private int id;
-    private String name;
+    private String value;
     private String direccion;
     private String coordx;
     private String coordy;
@@ -15,9 +15,9 @@ public class RegistroJson {
     private String identificador;
     private ArrayList<Products> products;
 
-    public RegistroJson(int id, String name) {
+    public RegistroJson(int id, String value) {
         this.id = id;
-        this.name = name;
+        this.value = value;
     }
 
     public RegistroJson(int id) {
@@ -32,12 +32,12 @@ public class RegistroJson {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getValue() {
+        return value;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public String getDireccion() {

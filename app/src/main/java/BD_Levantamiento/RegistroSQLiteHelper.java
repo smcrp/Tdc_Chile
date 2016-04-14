@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import Levantamiento.Products;
 import Levantamiento.Question;
 import Levantamiento.Registro;
 import Levantamiento.RegistroJson;
@@ -34,6 +35,7 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
 
     // TABLAS
     private static final String TABLE_REGISTRO = "Registro";
+    private static final String TABLE_PRODUCTO = "Producto";
     private static final String TABLE_PREGUNTA = "Pregunta";
 
     // NOMBRE COLUMNAS COMPARTIDAS
@@ -44,6 +46,9 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
     //TABLA REGISTRO
     private static final String STATUS = "status";
     private static final String CREATED = "created";
+
+    //TABLA PRODUCTO
+    private static final String ID_PRODUCT = "idproduct";
 
     //TABLA PREGUNTA
     private static final String ID_REGISTRO = "id_registro";
@@ -58,11 +63,16 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
             + ID_JSON + " INTEGER, " + NAME + " TEXT, "
             + STATUS + " INTEGER, " + CREATED + " DATETIME" + ")";
 
+    // CREAMOS TABLA REGISTRO DE PRODUCTO
+    private static final String CREA_TABLA_PRODUCTO = "CREATE TABLE "
+            + TABLE_PRODUCTO + "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + ID_REGISTRO + " INTEGER, " + ID_PRODUCT + " TEXT " + ")";
+
     // CREAMOS TABLA PREGUNTA
     private static final String CREA_TABLA_PREGUNTA = "CREATE TABLE "
             + TABLE_PREGUNTA + " (" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + ID_JSON + " INTEGER, " + ID_REGISTRO + " INTEGER, " + ID_TYPE + " INTEGER, "
-            + NAME + " TEXT, " + TYPE + " TEXT, " + LEVEL + " INTEGER, "
+            + NAME + " TEXT, " + TYPE + " TEXT, " + LEVEL + " INTEGER, " + ID_PRODUCT + " TEXT, "
             + ANSWER + " TEXT, " + " FOREIGN KEY(" + ID_REGISTRO + ") REFERENCES "
             + TABLE_PREGUNTA + "("+ ID +"))";
 
@@ -75,6 +85,7 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
         //Se ejecuta la sentencia SQL de creación de la tabla
         db.execSQL(CREA_TABLA_REGISTRO);
         db.execSQL(CREA_TABLA_PREGUNTA);
+        db.execSQL(CREA_TABLA_PRODUCTO);
     }
 
     @Override
@@ -108,6 +119,21 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * GUARDANDO PRODUCTO
+     */
+    public void guardarProducto(String id_producto, int id_registro) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(ID_REGISTRO, id_registro);
+        values.put(ID_PRODUCT, id_producto);
+
+        // INSERT REGISTRO
+        db.insert(TABLE_PRODUCTO, null, values);
+
+        cerrarBD();
+    }
+    /**
      * GUARDANDO PREGUNTA
      */
     public void guardarPregunta(Question pregunta) {
@@ -120,6 +146,7 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
         values.put(NAME, pregunta.getName());
         values.put(TYPE, pregunta.getType());
         values.put(LEVEL, pregunta.getLevel());
+        values.put(ID_PRODUCT, pregunta.getIdQr());
         values.put(ANSWER, pregunta.getAnswer());
 
         // INSERT REGISTRO
@@ -208,7 +235,45 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * OBTENEMOS REGISTRO POR ID
+     * OBTENEMOS PRODUCTOS POR ID
+     */
+    public RegistroJson obtenerProductosRegistroJson(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String selectQuery = "SELECT " + ID_PRODUCT + " FROM " + TABLE_PRODUCTO + " WHERE "
+                + ID + " = " + id;
+        Log.e(LOG, selectQuery);
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c != null)
+            c.moveToFirst();
+
+        RegistroJson registroJson = new RegistroJson(c.getInt(c.getColumnIndex(ID_JSON)),c.getString(c.getColumnIndex(NAME)));
+        //registro.setId(c.getInt(c.getColumnIndex(ID)));
+        //registro.setStatus(c.getInt(c.getColumnIndex(STATUS)));
+        //registro.setCreate(c.getString(c.getColumnIndex(CREATED)));
+
+        /*ArrayList<Question> preguntas = new ArrayList<>();
+        String selectQueryPreg = "SELECT * FROM " + TABLE_PREGUNTA
+                + " WHERE " + ID_REGISTRO + " = " + id;
+
+        Log.e(LOG, selectQueryPreg);
+
+        Cursor c2 = db.rawQuery(selectQueryPreg, null);
+
+        if (c2.moveToFirst()) {
+            do {
+                Question pregunta = new Question();
+                pregunta.setId(c2.getInt(c2.getColumnIndex(ID_JSON)));
+                pregunta.setAnswer(c2.getString(c2.getColumnIndex(ANSWER)));
+                preguntas.add(pregunta);
+            } while (c2.moveToNext());
+            registro.setQuestions(preguntas);
+        }*/
+        return registroJson;
+    }
+
+    /**
+     * OBTENEMOS PREGUNTAS POR ID
      */
     public ArrayList<Question> obtenerPreguntaJson(long idRegistro, int lvl) {
         ArrayList<Question> preguntas = new ArrayList<>();
@@ -237,6 +302,77 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
         return preguntas;
     }
 
+    /**
+     * OBTENEMOS PREGUNTAS POR ID
+     */
+    public ArrayList<Question> obtenerPreguntaQrJson(long idRegistro, String codeQr) {
+        ArrayList<Question> preguntas = new ArrayList<>();
+        String selectQuery = "SELECT " + TABLE_PREGUNTA + "." + ID_JSON + ","
+                + TABLE_PREGUNTA + "." + ANSWER + ","
+                + TABLE_PRODUCTO + "." + ID_PRODUCT
+                + " FROM " + TABLE_REGISTRO
+                + " INNER JOIN " + TABLE_PREGUNTA  + " ON "
+                + TABLE_REGISTRO + "." + ID + " = "
+                + TABLE_PREGUNTA + "." + ID_REGISTRO
+
+                + " INNER JOIN " + TABLE_PRODUCTO  + " ON "
+                + TABLE_PREGUNTA + "." + ID_PRODUCT + " = "
+                + TABLE_PRODUCTO + "." + ID_PRODUCT
+
+                + " WHERE "
+                + TABLE_PREGUNTA + "." + LEVEL + " = 2 AND "
+                //+ TABLE_PRODUCTO + "." + ID_PRODUCT + " = " + codeQr + " AND "
+                + TABLE_PRODUCTO + "." + ID_REGISTRO + " = " + idRegistro + " AND "
+                + TABLE_REGISTRO + "." + STATUS + " = 1 ";
+
+        Log.e(LOG, selectQuery);
+
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+            do {
+                Question pregunta = new Question();
+                pregunta.setId(c.getInt(c.getColumnIndex(ID_JSON)));
+                pregunta.setAnswer(c.getString(c.getColumnIndex(ANSWER)));
+                pregunta.setIdQr(c.getString(c.getColumnIndex(ID_PRODUCT)));
+                //Log.e("QR", c.getString(c.getColumnIndex(ID_PRODUCT)));
+                preguntas.add(pregunta);
+            } while (c.moveToNext());
+        }
+        return preguntas;
+    }
+
+    /**
+     * OBTENEMOS PREGUNTAS POR ID
+     */
+    public ArrayList<Products> obtenerProductos(long idRegistro) {
+        ArrayList<Products> productos = new ArrayList<>();
+        String selectQuery = "SELECT " + ID_PRODUCT
+                + " FROM " + TABLE_PRODUCTO;
+                //+ " INNER JOIN " + TABLE_PRODUCTO  + " ON "
+                //+ TABLE_REGISTRO + "." + ID + " = "
+                //+ TABLE_PRODUCTO + "." + ID_REGISTRO
+                //+ " WHERE "
+                //+ TABLE_PRODUCTO + "."
+                //+ ID_REGISTRO + " = " + idRegistro;
+
+        Log.e(LOG, selectQuery);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+            do {
+                Products producto = new Products();
+                producto.setId(c.getString(c.getColumnIndex(ID_PRODUCT)));
+                producto.setQuestions(obtenerPreguntaQrJson(idRegistro,c.getString(c.getColumnIndex(ID_PRODUCT))));
+                productos.add(producto);
+            } while (c.moveToNext());
+        }
+        return productos;
+    }
     /**
      * OBTENEMOS TODOS LOS REGISTROS
      * */
@@ -387,7 +523,6 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
         db.delete(TABLE_PREGUNTA, ID +" = " + pregunta.getId(), null);
         cerrarBD();
     }
-
 
     // Cerramos BD
     public void cerrarBD() {

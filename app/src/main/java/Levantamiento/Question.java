@@ -10,6 +10,7 @@ public class Question {
     private String type;
     private int idType;
     private int idRegistro;
+    private String idQr;
     private int level;
     private String answer;
 
@@ -35,6 +36,14 @@ public class Question {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getIdQr() {
+        return idQr;
+    }
+
+    public void setIdQr(String idQr) {
+        this.idQr = idQr;
     }
 
     public int getIdType() {

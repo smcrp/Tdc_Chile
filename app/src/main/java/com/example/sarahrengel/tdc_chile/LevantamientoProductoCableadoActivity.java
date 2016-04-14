@@ -2,11 +2,13 @@ package com.example.sarahrengel.tdc_chile;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -54,6 +56,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import BD_Levantamiento.HistoricoSQLiteHelper;
 import BD_Levantamiento.RegistroSQLiteHelper;
 import Connection.HttpClient;
 import Connection.OnHttpRequestComplete;
@@ -77,6 +80,10 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
 
     private EditText id;
     private EditText idqr;
+    String foto;
+    String dnfoto;
+    int valPaused = 0;
+
 
     private static final String URL_PRODUCTO = "http://186.103.141.44/TorresUnidas.com.Api/index.php/api/Levantamiento/QuestionProduct";
     private String codeQR;
@@ -88,6 +95,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -118,12 +126,20 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+       /*  DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        } else {*/
             super.onBackPressed();
+       // }
+    }
+    protected void onPause(){
+
+        super.onPause();
+        if(valPaused == 0){
+            finish();
         }
+        //termina la actividad
     }
 
     @Override
@@ -207,6 +223,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
     }
 
     private void guardarRespuestas(){
+        valPaused = 0;
         db = new RegistroSQLiteHelper(getApplicationContext());
 
         Intent intent = getIntent();
@@ -215,7 +232,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             Log.d("************ID REGIS: ", id_registro);
             Log.d("************CODIGO QR: ", codeQR);
 
-            TextView etiqueta_qr = (TextView) findViewById(R.id.etiqueta_qr);
+            /*TextView etiqueta_qr = (TextView) findViewById(R.id.etiqueta_qr);
             Question qr = new Question();
             qr.setLevel(2); //cableado
             qr.setId(1); //json
@@ -224,7 +241,9 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             qr.setName(etiqueta_qr.getText().toString());//Json
             qr.setIdRegistro(Integer.parseInt(id_registro));//bd
             qr.setAnswer(codeQR);//vista
-            db.guardarPregunta(qr);
+            db.guardarPregunta(qr);*/
+
+            db.guardarProducto(codeQR, Integer.parseInt(id_registro));
 
             TextView etiqueta_modelo = (TextView) findViewById(R.id.etiqueta_modelo);
             EditText texto_modelo = (EditText) findViewById(R.id.texto_modelo);
@@ -234,6 +253,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q1.setId(3); //json
             q1.setIdType(3); //json
             q1.setType("TEXT");//json
+            q1.setIdQr(codeQR);
             q1.setName(etiqueta_modelo.getText().toString());//Json
             q1.setIdRegistro(Integer.parseInt(id_registro));//bd
             q1.setAnswer(texto_modelo.getText().toString());//vista
@@ -247,6 +267,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q2.setId(4); //json
             q2.setIdType(3); //json
             q2.setType("TEXT");//json
+            q2.setIdQr(codeQR);
             q2.setName(etiqueta_marca.getText().toString());//Json
             q2.setIdRegistro(Integer.parseInt(id_registro));//bd
             q2.setAnswer(texto_marca.getText().toString());//vista
@@ -260,6 +281,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q3.setId(5); //json
             q3.setIdType(3); //json
             q3.setType("TEXT");//json
+            q3.setIdQr(codeQR);
             q3.setName(etiqueta_tipo.getText().toString());//Json
             q3.setIdRegistro(Integer.parseInt(id_registro));//bd
             q3.setAnswer(texto_tipo.getText().toString());//vista
@@ -273,6 +295,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q4.setId(6); //json
             q4.setIdType(3); //json
             q4.setType("TEXT");//json
+            q4.setIdQr(codeQR);
             q4.setName(etiqueta_tipoBanda.getText().toString());//Json
             q4.setIdRegistro(Integer.parseInt(id_registro));//bd
             q4.setAnswer(texto_tipo_banda.getText().toString());//vista
@@ -286,6 +309,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q5.setId(7); //json
             q5.setIdType(3); //json
             q5.setType("TEXT");//json
+            q5.setIdQr(codeQR);
             q5.setName(etiqueta_banda.getText().toString());//Json
             q5.setIdRegistro(Integer.parseInt(id_registro));//bd
             q5.setAnswer(texto_banda.getText().toString());//vista
@@ -299,6 +323,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q6.setId(8); //json
             q6.setIdType(3); //json
             q6.setType("TEXT");//json
+            q6.setIdQr(codeQR);
             q6.setName(etiqueta_frecuencia.getText().toString());//Json
             q6.setIdRegistro(Integer.parseInt(id_registro));//bd
             q6.setAnswer(texto_frecuencia.getText().toString());//vista
@@ -312,6 +337,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q7.setId(12); //json
             q7.setIdType(3); //json
             q7.setType("TEXT");//json
+            q7.setIdQr(codeQR);
             q7.setName(etiqueta_electrical.getText().toString());//Json
             q7.setIdRegistro(Integer.parseInt(id_registro));//bd
             q7.setAnswer(texto_eletrical_tilt.getText().toString());//vista
@@ -325,6 +351,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q8.setId(9); //json
             q8.setIdType(4); //json
             q8.setType("NUM");//json
+            q8.setIdQr(codeQR);
             q8.setName(etiqueta_luzH.getText().toString());//Json
             q8.setIdRegistro(Integer.parseInt(id_registro));//bd
             q8.setAnswer(texto_luz_horizontal.getText().toString());//vista
@@ -338,6 +365,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q9.setId(10); //json
             q9.setIdType(4); //json
             q9.setType("NUM");//json
+            q9.setIdQr(codeQR);
             q9.setName(etiqueta_luzV.getText().toString());//Json
             q9.setIdRegistro(Integer.parseInt(id_registro));//bd
             q9.setAnswer(texto_luz_vertical.getText().toString());//vista
@@ -351,6 +379,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q10.setId(11); //json
             q10.setIdType(4); //json
             q10.setType("NUM");//json
+            q10.setIdQr(codeQR);
             q10.setName(etiqueta_ganancia.getText().toString());//Json
             q10.setIdRegistro(Integer.parseInt(id_registro));//bd
             q10.setAnswer(texto_ganancia.getText().toString());//vista
@@ -364,6 +393,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q11.setId(13); //json
             q11.setIdType(4); //json
             q11.setType("NUM");//json
+            q11.setIdQr(codeQR);
             q11.setName(etiqueta_instalacion.getText().toString());//Json
             q11.setIdRegistro(Integer.parseInt(id_registro));//bd
             q11.setAnswer(texto_altura_instalacion.getText().toString());//vista
@@ -377,6 +407,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q12.setId(15); //json
             q12.setIdType(4); //json
             q12.setType("NUM");//json
+            q12.setIdQr(codeQR);
             q12.setName(etiqueta_largo.getText().toString());//Json
             q12.setIdRegistro(Integer.parseInt(id_registro));//bd
             q12.setAnswer(texto_largo.getText().toString());//vista
@@ -390,6 +421,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q13.setId(16); //json
             q13.setIdType(4); //json
             q13.setType("NUM");//json
+            q13.setIdQr(codeQR);
             q13.setName(etiqueta_alto.getText().toString());//Json
             q13.setIdRegistro(Integer.parseInt(id_registro));//bd
             q13.setAnswer(texto_alto.getText().toString());//vista
@@ -403,6 +435,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             q14.setId(17); //json
             q14.setIdType(4); //json
             q14.setType("NUM");//json
+            q14.setIdQr(codeQR);
             q14.setName(etiqueta_profundidad.getText().toString());//Json
             q14.setIdRegistro(Integer.parseInt(id_registro));//bd
             q14.setAnswer(texto_profundidad.getText().toString());//vista
@@ -419,6 +452,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
     }
 
     public void callZXing() {
+        valPaused = 1;
         try {
             Intent it = new Intent(LevantamientoProductoCableadoActivity.this, com.google.zxing.client.android.CaptureActivity.class);
             Log.e("callZXing", "Se Inicio el Lector");
@@ -432,7 +466,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
     }
 
     private void selectImage() {
-
+        valPaused = 1;
         final CharSequence[] options = {"Nueva Foto", "Cancelar"};
         AlertDialog.Builder builder = new AlertDialog.Builder(LevantamientoProductoCableadoActivity.this);
         builder.setTitle("Agregar Foto");
@@ -441,9 +475,27 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (options[item].equals("Nueva Foto")) {
+                    HistoricoSQLiteHelper helper = new HistoricoSQLiteHelper(getBaseContext(),"Historico",null,1);
+                    SQLiteDatabase db = helper.getWritableDatabase();
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                     File f = new File(android.os.Environment.getExternalStorageDirectory(), "img_" + timeStamp + ".jpg"); //ruta y nombre de la foto
+
+                    db.delete("foto", null, null);
+
+                    foto = f.toString();
+                    dnfoto = "img_" + timeStamp + ".jpg";
+                    ContentValues ruta = new ContentValues();
+                    ruta.put("Ruta ",foto);
+                    ruta.put("dnfoto",dnfoto);
+
+                    db.insert("foto", null, ruta);
+                    db.close();
+
+                    //foto = f.toString();
+                    //app.setRuta(f.toString());
+                    //app.setDnfoto("img_" + timeStamp + ".jpg");
+                    //dnfoto = "img_" + timeStamp + ".jpg";
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
                     startActivityForResult(intent, 2);
                 } else if (options[item].equals("Cancelar")) {
@@ -453,6 +505,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
         });
         builder.show();
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

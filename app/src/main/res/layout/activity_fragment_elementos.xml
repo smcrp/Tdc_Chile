@@ -14,7 +14,8 @@
             android:text="Editar Producto"
             android:layout_centerHorizontal="true"
             android:clickable="false"
-            android:nestedScrollingEnabled="false" />
+            android:nestedScrollingEnabled="false"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/btn_eliminar"
