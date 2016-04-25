@@ -24,8 +24,5 @@ tools:context="com.example.sarahrengel.tdc_chile.LevantamientoActivity">
     app:headerLayout="@layout/nav_header_main"
     app:menu="@menu/activity_main_drawer" />
 
-
-
-
 </android.support.v4.widget.DrawerLayout>
 

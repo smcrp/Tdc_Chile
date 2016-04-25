@@ -4,13 +4,16 @@ import android.Manifest;
 import android.app.FragmentManager;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,6 +74,7 @@ public class MainActivity extends ListActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Torres");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION);
@@ -99,6 +103,7 @@ public class MainActivity extends ListActivity
             }
 
         }
+
        // setSupportActionBar(toolbar);
         antenas = (ListView)findViewById(R.id.list_antena);
         db = new RegistroSQLiteHelper(getApplicationContext());
@@ -109,10 +114,20 @@ public class MainActivity extends ListActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getBaseContext(), LevantamientoActivity.class);
-                startActivity(intent);
-                /*Intent intent = new Intent(getBaseContext(), LevantamientoProductoActivity.class);
-                startActivity(intent);*/
+                final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    AlertNoGps();
+                        /*Intent settingsIntent = new
+                                Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        settingsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                                Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                        startActivityForResult(settingsIntent, 0);*/
+                }else {
+
+                    Intent intent = new Intent(getBaseContext(), LevantamientoActivity.class);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -267,6 +282,21 @@ public class MainActivity extends ListActivity
         return true;
     }
 
-
+    private void AlertNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("El sistema GPS esta desactivado, ¿Desea activarlo?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        builder.show();
+    }
 
 }

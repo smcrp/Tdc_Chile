@@ -1,7 +1,9 @@
 package com.example.sarahrengel.tdc_chile;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
@@ -96,11 +98,11 @@ public class LevantamientoActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 leerRespuestas();
-                db.guardarRegistro(registro);
+               // db.guardarRegistro(registro);
                /*  final Intent intent = new Intent(getBaseContext(), LevantamientoProductoActivity.class);
-                startActivity(intent);*/
-                final Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 startActivity(intent);
+                final Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(intent);*/
             }
         });
 
@@ -169,6 +171,8 @@ public class LevantamientoActivity extends AppCompatActivity
     }
 
     private void leerRespuestas() {
+        EditText editText = null;
+        String eId = null;
         int count = listaQuestion.getChildCount();
         db = new RegistroSQLiteHelper(getApplicationContext());
         int id_registro = db.obtenerUltIdRegistro();
@@ -176,12 +180,12 @@ public class LevantamientoActivity extends AppCompatActivity
             for (int i = 0; i < count; i++) {
                 View row = (View) listaQuestion.getChildAt(i);
                 TextView tvNombre = (TextView) row.findViewById(R.id.name);
-                EditText editText = (EditText) row.findViewById(R.id.id);
+                editText = (EditText) row.findViewById(R.id.id);
                 EditText editTextLong = (EditText) row.findViewById(R.id.coordLong);
                 EditText editTextLat = (EditText) row.findViewById(R.id.coordLat);
 
                 String tNombre = tvNombre.getText().toString();
-                String eId = editText.getText().toString();
+                 eId = editText.getText().toString();
                 String eIdLong = editTextLong.getText().toString();
                 String eIdLat = editTextLat.getText().toString();
 
@@ -205,10 +209,28 @@ public class LevantamientoActivity extends AppCompatActivity
             Log.e("REGISTRO", String.valueOf(registro.getId()));
             Log.e("REGISTRO", String.valueOf(registro.getName()));
 
-            for (int i = 0; i < registro.getQuestions().size(); i++) {
-                Log.e("RESP", String.valueOf(registro.getQuestions().get(i).getId()));
-                Log.e("RESP", String.valueOf(registro.getQuestions().get(i).getIdRegistro()));
-                Log.e("RESP", String.valueOf(registro.getQuestions().get(i).getAnswer()));
+            if(registro.getQuestions().get(0).getName().equalsIgnoreCase("Ingresar nombre de la antena") && !registro.getQuestions().get(0).getAnswer().trim().equalsIgnoreCase("")) {
+                //else
+                for (int i = 0; i < registro.getQuestions().size(); i++) {
+                    Log.e("RESP", String.valueOf(registro.getQuestions().get(i).getId()));
+                    Log.e("RESP", String.valueOf(registro.getQuestions().get(i).getIdRegistro()));
+                    Log.e("RESP", String.valueOf(registro.getQuestions().get(i).getAnswer()));
+                }
+                db.guardarRegistro(registro);
+                final Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(intent);
+            }else {
+                AlertDialog.Builder b = new AlertDialog.Builder(LevantamientoActivity.this);
+                b.setMessage("Debe llenar el formulario");
+                b.setCancelable(false);
+                b.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // actividad.finish();
+                        dialogInterface.dismiss();
+                    }
+                });
+                b.show();
             }
 
         } catch (Exception e) {

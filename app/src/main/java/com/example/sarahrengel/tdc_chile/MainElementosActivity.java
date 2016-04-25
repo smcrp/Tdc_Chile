@@ -49,7 +49,7 @@ import Fragmentos.FragmentElementos;
 import Levantamiento.Question;
 import Levantamiento.Registro;
 
-public class MainElementosActivity extends ListActivity
+public class MainElementosActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private LinearLayout StackContent;
@@ -68,7 +68,10 @@ public class MainElementosActivity extends ListActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_elementos_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        // setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+       // toolbar.setTitle("Productos");
         antenas = (ListView)findViewById(R.id.list_antena);
         db = new RegistroSQLiteHelper(getApplicationContext());
 
@@ -83,14 +86,13 @@ public class MainElementosActivity extends ListActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+      /*  DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this);*/
 
         StackContent = (LinearLayout) findViewById(R.id.StackContent);
 
@@ -104,7 +106,7 @@ public class MainElementosActivity extends ListActivity
                 String i = listaantenas.get(position).get(TAG_IDANTENA);
                 String e = listaantenas.get(position).get(TAG_DNIANTENA);
 
-                Toast.makeText(MainElementosActivity.this, i, Toast.LENGTH_SHORT).show();
+               // Toast.makeText(MainElementosActivity.this, i, Toast.LENGTH_SHORT).show();
 
                 Bundle bundle = new Bundle();
                 bundle.putString("posicion", i);
@@ -187,7 +189,7 @@ public class MainElementosActivity extends ListActivity
     public void mostrarResultRegistros() {
         TextView tView = new TextView(this);
         tView.setText("Registros creados");//titulo del main (registro)
-        getListView().addHeaderView(tView);
+      //  getListView().addHeaderView(tView);
 
         adapterList3 = new AdapterList3(MainElementosActivity.this,listaantenas);
         antenas.setAdapter(adapterList3);
@@ -214,7 +216,6 @@ public class MainElementosActivity extends ListActivity
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
       /*  if (id == R.id.action_settings) {
             return true;

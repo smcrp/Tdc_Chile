@@ -2,6 +2,7 @@ package com.example.sarahrengel.tdc_chile;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -43,6 +44,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -59,16 +61,19 @@ import java.util.List;
 import BD_Levantamiento.HistoricoSQLiteHelper;
 import BD_Levantamiento.RegistroSQLiteHelper;
 import Connection.HttpClient;
+import Connection.JsonParser;
 import Connection.OnHttpRequestComplete;
 import Connection.Response;
 import Levantamiento.PHOTO;
 import Levantamiento.Question;
 import Levantamiento.Registro;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 
 public class LevantamientoProductoCableadoActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    public static Activity actividad;
     private Registro registro;
     private JSONArray jsonArray = null;
     private JSONArray jsonQuest = null;
@@ -83,10 +88,12 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
     String foto;
     String dnfoto;
     int valPaused = 0;
+    ProgressDialog dialog;
 
-
+    private static final String URL_CHECKQR = "http://186.103.141.44/TorresUnidas.com.Api/index.php/api/Levantamiento/validateNull";
     private static final String URL_PRODUCTO = "http://186.103.141.44/TorresUnidas.com.Api/index.php/api/Levantamiento/QuestionProduct";
     private String codeQR;
+    JsonParser jsonParser = new JsonParser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +120,8 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
                 selectImage();
             }
         });
-
+       // Toast.makeText(LevantamientoProductoCableadoActivity.this, "entro", Toast.LENGTH_LONG).show();
+        actividad = this;
         callZXing();
     }
 
@@ -247,203 +255,235 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
 
             TextView etiqueta_modelo = (TextView) findViewById(R.id.etiqueta_modelo);
             EditText texto_modelo = (EditText) findViewById(R.id.texto_modelo);
-            Log.d("************texto_modelo: ", texto_modelo.getText().toString());
-            Question q1 = new Question();
-            q1.setLevel(2); //cableado
-            q1.setId(3); //json
-            q1.setIdType(3); //json
-            q1.setType("TEXT");//json
-            q1.setIdQr(codeQR);
-            q1.setName(etiqueta_modelo.getText().toString());//Json
-            q1.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q1.setAnswer(texto_modelo.getText().toString());//vista
-            db.guardarPregunta(q1);
+            Log.d("******texto_modelo: ", texto_modelo.getText().toString());
+            if (!texto_modelo.getText().toString().trim().equals("")) {
+                Question q1 = new Question();
+                q1.setLevel(2); //cableado
+                q1.setId(3); //json
+                q1.setIdType(3); //json
+                q1.setType("TEXT");//json
+                q1.setIdQr(codeQR);
+                q1.setName(etiqueta_modelo.getText().toString());//Json
+                q1.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q1.setAnswer(texto_modelo.getText().toString());//vista
+                db.guardarPregunta(q1);
 
-            TextView etiqueta_marca = (TextView) findViewById(R.id.etiqueta_marca);
-            EditText texto_marca = (EditText) findViewById(R.id.texto_marca);
-            Log.d("************texto_marca: ", texto_marca.getText().toString());
-            Question q2 = new Question();
-            q2.setLevel(2); //cableado
-            q2.setId(4); //json
-            q2.setIdType(3); //json
-            q2.setType("TEXT");//json
-            q2.setIdQr(codeQR);
-            q2.setName(etiqueta_marca.getText().toString());//Json
-            q2.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q2.setAnswer(texto_marca.getText().toString());//vista
-            db.guardarPregunta(q2);
+                TextView etiqueta_marca = (TextView) findViewById(R.id.etiqueta_marca);
+                EditText texto_marca = (EditText) findViewById(R.id.texto_marca);
+                if (!texto_marca.getText().equals("")) {
+                    Log.d("******texto_marca: ", texto_marca.getText().toString());
+                    Question q2 = new Question();
+                    q2.setLevel(2); //cableado
+                    q2.setId(4); //json
+                    q2.setIdType(3); //json
+                    q2.setType("TEXT");//json
+                    q2.setIdQr(codeQR);
+                    q2.setName(etiqueta_marca.getText().toString());//Json
+                    q2.setIdRegistro(Integer.parseInt(id_registro));//bd
+                    q2.setAnswer(texto_marca.getText().toString());//vista
+                    db.guardarPregunta(q2);
+                }
+                TextView etiqueta_tipo = (TextView) findViewById(R.id.etiqueta_tipo);
+                EditText texto_tipo = (EditText) findViewById(R.id.texto_tipo);
+                Log.d("******texto_tipo: ", texto_tipo.getText().toString());
+                //  if (!texto_tipo.getText().equals("")) {
+                Question q3 = new Question();
+                q3.setLevel(2); //cableado
+                q3.setId(5); //json
+                q3.setIdType(3); //json
+                q3.setType("TEXT");//json
+                q3.setIdQr(codeQR);
+                q3.setName(etiqueta_tipo.getText().toString());//Json
+                q3.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q3.setAnswer(texto_tipo.getText().toString());//vista
+                db.guardarPregunta(q3);
+                // }
+                TextView etiqueta_tipoBanda = (TextView) findViewById(R.id.etiqueta_tipo_banda);
+                EditText texto_tipo_banda = (EditText) findViewById(R.id.texto_tipo_banda);
+                Log.d("******texto_tipo_banda: ", texto_tipo_banda.getText().toString());
+                //  if (!texto_tipo_banda.getText().equals("")) {
+                Question q4 = new Question();
+                q4.setLevel(2); //cableado
+                q4.setId(6); //json
+                q4.setIdType(3); //json
+                q4.setType("TEXT");//json
+                q4.setIdQr(codeQR);
+                q4.setName(etiqueta_tipoBanda.getText().toString());//Json
+                q4.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q4.setAnswer(texto_tipo_banda.getText().toString());//vista
+                db.guardarPregunta(q4);
+                //  }
 
-            TextView etiqueta_tipo = (TextView) findViewById(R.id.etiqueta_tipo);
-            EditText texto_tipo = (EditText) findViewById(R.id.texto_tipo);
-            Log.d("************texto_tipo: ", texto_tipo.getText().toString());
-            Question q3 = new Question();
-            q3.setLevel(2); //cableado
-            q3.setId(5); //json
-            q3.setIdType(3); //json
-            q3.setType("TEXT");//json
-            q3.setIdQr(codeQR);
-            q3.setName(etiqueta_tipo.getText().toString());//Json
-            q3.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q3.setAnswer(texto_tipo.getText().toString());//vista
-            db.guardarPregunta(q3);
+                TextView etiqueta_banda = (TextView) findViewById(R.id.etiqueta_banda);
+                EditText texto_banda = (EditText) findViewById(R.id.texto_banda);
+                Log.d("************texto_banda: ", texto_banda.getText().toString());
+                // if (!texto_banda.getText().equals("")) {
+                Question q5 = new Question();
+                q5.setLevel(2); //cableado
+                q5.setId(7); //json
+                q5.setIdType(3); //json
+                q5.setType("TEXT");//json
+                q5.setIdQr(codeQR);
+                q5.setName(etiqueta_banda.getText().toString());//Json
+                q5.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q5.setAnswer(texto_banda.getText().toString());//vista
+                db.guardarPregunta(q5);
+                // }
 
-            TextView etiqueta_tipoBanda = (TextView) findViewById(R.id.etiqueta_tipo_banda);
-            EditText texto_tipo_banda = (EditText) findViewById(R.id.texto_tipo_banda);
-            Log.d("************texto_tipo_banda: ", texto_tipo_banda.getText().toString());
-            Question q4 = new Question();
-            q4.setLevel(2); //cableado
-            q4.setId(6); //json
-            q4.setIdType(3); //json
-            q4.setType("TEXT");//json
-            q4.setIdQr(codeQR);
-            q4.setName(etiqueta_tipoBanda.getText().toString());//Json
-            q4.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q4.setAnswer(texto_tipo_banda.getText().toString());//vista
-            db.guardarPregunta(q4);
+                TextView etiqueta_frecuencia = (TextView) findViewById(R.id.etiqueta_frecuencia);
+                EditText texto_frecuencia = (EditText) findViewById(R.id.texto_frecuencia);
+                Log.d("************texto_frecuencia: ", texto_frecuencia.getText().toString());
+                //  if (!texto_frecuencia.getText().equals("")) {
+                Question q6 = new Question();
+                q6.setLevel(2); //cableado
+                q6.setId(8); //json
+                q6.setIdType(3); //json
+                q6.setType("TEXT");//json
+                q6.setIdQr(codeQR);
+                q6.setName(etiqueta_frecuencia.getText().toString());//Json
+                q6.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q6.setAnswer(texto_frecuencia.getText().toString());//vista
+                db.guardarPregunta(q6);
+                // }
 
-            TextView etiqueta_banda = (TextView) findViewById(R.id.etiqueta_banda);
-            EditText texto_banda = (EditText) findViewById(R.id.texto_banda);
-            Log.d("************texto_banda: ", texto_banda.getText().toString());
-            Question q5 = new Question();
-            q5.setLevel(2); //cableado
-            q5.setId(7); //json
-            q5.setIdType(3); //json
-            q5.setType("TEXT");//json
-            q5.setIdQr(codeQR);
-            q5.setName(etiqueta_banda.getText().toString());//Json
-            q5.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q5.setAnswer(texto_banda.getText().toString());//vista
-            db.guardarPregunta(q5);
+                TextView etiqueta_electrical = (TextView) findViewById(R.id.etiqueta_eletrical_tilt);
+                EditText texto_eletrical_tilt = (EditText) findViewById(R.id.texto_eletrical_tilt);
+                Log.d("*******texto_eletrical_tilt: ", texto_eletrical_tilt.getText().toString());
+                // if (!texto_eletrical_tilt.getText().equals("")) {
+                Question q7 = new Question();
+                q7.setLevel(2); //cableado
+                q7.setId(12); //json
+                q7.setIdType(3); //json
+                q7.setType("TEXT");//json
+                q7.setIdQr(codeQR);
+                q7.setName(etiqueta_electrical.getText().toString());//Json
+                q7.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q7.setAnswer(texto_eletrical_tilt.getText().toString());//vista
+                db.guardarPregunta(q7);
+                //}
 
-            TextView etiqueta_frecuencia = (TextView) findViewById(R.id.etiqueta_frecuencia);
-            EditText texto_frecuencia = (EditText) findViewById(R.id.texto_frecuencia);
-            Log.d("************texto_frecuencia: ", texto_frecuencia.getText().toString());
-            Question q6 = new Question();
-            q6.setLevel(2); //cableado
-            q6.setId(8); //json
-            q6.setIdType(3); //json
-            q6.setType("TEXT");//json
-            q6.setIdQr(codeQR);
-            q6.setName(etiqueta_frecuencia.getText().toString());//Json
-            q6.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q6.setAnswer(texto_frecuencia.getText().toString());//vista
-            db.guardarPregunta(q6);
+                TextView etiqueta_luzH = (TextView) findViewById(R.id.etiqueta_luz_horizontal);
+                EditText texto_luz_horizontal = (EditText) findViewById(R.id.texto_luz_horizontal);
+                Log.d("*********texto_luz_horizontal: ", texto_luz_horizontal.getText().toString());
+                // if (!texto_luz_horizontal.getText().equals("")) {
+                Question q8 = new Question();
+                q8.setLevel(2); //cableado
+                q8.setId(9); //json
+                q8.setIdType(4); //json
+                q8.setType("NUM");//json
+                q8.setIdQr(codeQR);
+                q8.setName(etiqueta_luzH.getText().toString());//Json
+                q8.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q8.setAnswer(texto_luz_horizontal.getText().toString());//vista
+                db.guardarPregunta(q8);
+                //}
 
-            TextView etiqueta_electrical = (TextView) findViewById(R.id.etiqueta_eletrical_tilt);
-            EditText texto_eletrical_tilt = (EditText) findViewById(R.id.texto_eletrical_tilt);
-            Log.d("************texto_eletrical_tilt: ", texto_eletrical_tilt.getText().toString());
-            Question q7 = new Question();
-            q7.setLevel(2); //cableado
-            q7.setId(12); //json
-            q7.setIdType(3); //json
-            q7.setType("TEXT");//json
-            q7.setIdQr(codeQR);
-            q7.setName(etiqueta_electrical.getText().toString());//Json
-            q7.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q7.setAnswer(texto_eletrical_tilt.getText().toString());//vista
-            db.guardarPregunta(q7);
+                TextView etiqueta_luzV = (TextView) findViewById(R.id.etiqueta_luz_vertical);
+                EditText texto_luz_vertical = (EditText) findViewById(R.id.texto_luz_vertical);
+                Log.d("************texto_luz_vertical: ", texto_luz_vertical.getText().toString());
+                // if (!texto_luz_vertical.getText().equals("")) {
+                Question q9 = new Question();
+                q9.setLevel(2); //cableado
+                q9.setId(10); //json
+                q9.setIdType(4); //json
+                q9.setType("NUM");//json
+                q9.setIdQr(codeQR);
+                q9.setName(etiqueta_luzV.getText().toString());//Json
+                q9.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q9.setAnswer(texto_luz_vertical.getText().toString());//vista
+                db.guardarPregunta(q9);
+                // }
 
-            TextView etiqueta_luzH = (TextView) findViewById(R.id.etiqueta_luz_horizontal);
-            EditText texto_luz_horizontal = (EditText) findViewById(R.id.texto_luz_horizontal);
-            Log.d("************texto_luz_horizontal: ", texto_luz_horizontal.getText().toString());
-            Question q8 = new Question();
-            q8.setLevel(2); //cableado
-            q8.setId(9); //json
-            q8.setIdType(4); //json
-            q8.setType("NUM");//json
-            q8.setIdQr(codeQR);
-            q8.setName(etiqueta_luzH.getText().toString());//Json
-            q8.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q8.setAnswer(texto_luz_horizontal.getText().toString());//vista
-            db.guardarPregunta(q8);
+                TextView etiqueta_ganancia = (TextView) findViewById(R.id.etiqueta_ganancia);
+                EditText texto_ganancia = (EditText) findViewById(R.id.texto_ganancia);
+                Log.d("************texto_ganancia: ", texto_ganancia.getText().toString());
+                // if (!texto_ganancia.getText().equals("")) {
+                Question q10 = new Question();
+                q10.setLevel(2); //cableado
+                q10.setId(11); //json
+                q10.setIdType(4); //json
+                q10.setType("NUM");//json
+                q10.setIdQr(codeQR);
+                q10.setName(etiqueta_ganancia.getText().toString());//Json
+                q10.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q10.setAnswer(texto_ganancia.getText().toString());//vista
+                db.guardarPregunta(q10);
+                // }
 
-            TextView etiqueta_luzV = (TextView) findViewById(R.id.etiqueta_luz_vertical);
-            EditText texto_luz_vertical = (EditText) findViewById(R.id.texto_luz_vertical);
-            Log.d("************texto_luz_vertical: ", texto_luz_vertical.getText().toString());
-            Question q9 = new Question();
-            q9.setLevel(2); //cableado
-            q9.setId(10); //json
-            q9.setIdType(4); //json
-            q9.setType("NUM");//json
-            q9.setIdQr(codeQR);
-            q9.setName(etiqueta_luzV.getText().toString());//Json
-            q9.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q9.setAnswer(texto_luz_vertical.getText().toString());//vista
-            db.guardarPregunta(q9);
+                TextView etiqueta_instalacion = (TextView) findViewById(R.id.etiqueta_altura_instalacion);
+                EditText texto_altura_instalacion = (EditText) findViewById(R.id.texto_altura_instalacion);
+                Log.d("************texto_altura_instalacion: ", texto_altura_instalacion.getText().toString());
+                // if (!texto_luz_vertical.getText().equals("")) {
+                Question q11 = new Question();
+                q11.setLevel(2); //cableado
+                q11.setId(13); //json
+                q11.setIdType(4); //json
+                q11.setType("NUM");//json
+                q11.setIdQr(codeQR);
+                q11.setName(etiqueta_instalacion.getText().toString());//Json
+                q11.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q11.setAnswer(texto_altura_instalacion.getText().toString());//vista
+                db.guardarPregunta(q11);
+                //   }
 
-            TextView etiqueta_ganancia = (TextView) findViewById(R.id.etiqueta_ganancia);
-            EditText texto_ganancia = (EditText) findViewById(R.id.texto_ganancia);
-            Log.d("************texto_ganancia: ", texto_ganancia.getText().toString());
-            Question q10 = new Question();
-            q10.setLevel(2); //cableado
-            q10.setId(11); //json
-            q10.setIdType(4); //json
-            q10.setType("NUM");//json
-            q10.setIdQr(codeQR);
-            q10.setName(etiqueta_ganancia.getText().toString());//Json
-            q10.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q10.setAnswer(texto_ganancia.getText().toString());//vista
-            db.guardarPregunta(q10);
+                TextView etiqueta_largo = (TextView) findViewById(R.id.etiqueta_largo);
+                EditText texto_largo = (EditText) findViewById(R.id.texto_largo);
+                Log.d("************texto_largo: ", texto_largo.getText().toString());
+                Question q12 = new Question();
+                q12.setLevel(2); //cableado
+                q12.setId(15); //json
+                q12.setIdType(4); //json
+                q12.setType("NUM");//json
+                q12.setIdQr(codeQR);
+                q12.setName(etiqueta_largo.getText().toString());//Json
+                q12.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q12.setAnswer(texto_largo.getText().toString());//vista
+                db.guardarPregunta(q12);
 
-            TextView etiqueta_instalacion = (TextView) findViewById(R.id.etiqueta_altura_instalacion);
-            EditText texto_altura_instalacion = (EditText) findViewById(R.id.texto_altura_instalacion);
-            Log.d("************texto_altura_instalacion: ", texto_altura_instalacion.getText().toString());
-            Question q11 = new Question();
-            q11.setLevel(2); //cableado
-            q11.setId(13); //json
-            q11.setIdType(4); //json
-            q11.setType("NUM");//json
-            q11.setIdQr(codeQR);
-            q11.setName(etiqueta_instalacion.getText().toString());//Json
-            q11.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q11.setAnswer(texto_altura_instalacion.getText().toString());//vista
-            db.guardarPregunta(q11);
+                TextView etiqueta_alto = (TextView) findViewById(R.id.etiqueta_alto);
+                EditText texto_alto = (EditText) findViewById(R.id.texto_alto);
+                Log.d("************texto_alto: ", texto_alto.getText().toString());
+                Question q13 = new Question();
+                q13.setLevel(2); //cableado
+                q13.setId(16); //json
+                q13.setIdType(4); //json
+                q13.setType("NUM");//json
+                q13.setIdQr(codeQR);
+                q13.setName(etiqueta_alto.getText().toString());//Json
+                q13.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q13.setAnswer(texto_alto.getText().toString());//vista
+                db.guardarPregunta(q13);
 
-            TextView etiqueta_largo = (TextView) findViewById(R.id.etiqueta_largo);
-            EditText texto_largo = (EditText) findViewById(R.id.texto_largo);
-            Log.d("************texto_largo: ", texto_largo.getText().toString());
-            Question q12 = new Question();
-            q12.setLevel(2); //cableado
-            q12.setId(15); //json
-            q12.setIdType(4); //json
-            q12.setType("NUM");//json
-            q12.setIdQr(codeQR);
-            q12.setName(etiqueta_largo.getText().toString());//Json
-            q12.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q12.setAnswer(texto_largo.getText().toString());//vista
-            db.guardarPregunta(q12);
+                TextView etiqueta_profundidad = (TextView) findViewById(R.id.etiqueta_profundidad);
+                EditText texto_profundidad = (EditText) findViewById(R.id.texto_profundidad);
+                Log.d("************texto_profundidad: ", texto_profundidad.getText().toString());
+                Question q14 = new Question();
+                q14.setLevel(2); //cableado
+                q14.setId(17); //json
+                q14.setIdType(4); //json
+                q14.setType("NUM");//json
+                q14.setIdQr(codeQR);
+                q14.setName(etiqueta_profundidad.getText().toString());//Json
+                q14.setIdRegistro(Integer.parseInt(id_registro));//bd
+                q14.setAnswer(texto_profundidad.getText().toString());//vista
+                db.guardarPregunta(q14);
 
-            TextView etiqueta_alto = (TextView) findViewById(R.id.etiqueta_alto);
-            EditText texto_alto = (EditText) findViewById(R.id.texto_alto);
-            Log.d("************texto_alto: ", texto_alto.getText().toString());
-            Question q13 = new Question();
-            q13.setLevel(2); //cableado
-            q13.setId(16); //json
-            q13.setIdType(4); //json
-            q13.setType("NUM");//json
-            q13.setIdQr(codeQR);
-            q13.setName(etiqueta_alto.getText().toString());//Json
-            q13.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q13.setAnswer(texto_alto.getText().toString());//vista
-            db.guardarPregunta(q13);
-
-            TextView etiqueta_profundidad = (TextView) findViewById(R.id.etiqueta_profundidad);
-            EditText texto_profundidad = (EditText) findViewById(R.id.texto_profundidad);
-            Log.d("************texto_profundidad: ", texto_profundidad.getText().toString());
-            Question q14 = new Question();
-            q14.setLevel(2); //cableado
-            q14.setId(17); //json
-            q14.setIdType(4); //json
-            q14.setType("NUM");//json
-            q14.setIdQr(codeQR);
-            q14.setName(etiqueta_profundidad.getText().toString());//Json
-            q14.setIdRegistro(Integer.parseInt(id_registro));//bd
-            q14.setAnswer(texto_profundidad.getText().toString());//vista
-            db.guardarPregunta(q14);
-
-            Intent intentMain = new Intent(LevantamientoProductoCableadoActivity.this, MainElementosActivity.class);
-            intentMain.putExtra("idRegistro", id_registro);
-            startActivity(intentMain);
+                Intent intentMain = new Intent(LevantamientoProductoCableadoActivity.this, MainElementosActivity.class);
+                intentMain.putExtra("idRegistro", id_registro);
+                startActivity(intentMain);
+            } else{
+                AlertDialog.Builder b = new AlertDialog.Builder(LevantamientoProductoCableadoActivity.this);
+                b.setMessage("Debe llenar el campo modelo");
+                b.setCancelable(false);
+                b.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // actividad.finish();
+                        dialogInterface.dismiss();
+                    }
+                });
+                b.show();
+            }
 
         }catch (Exception e) {
             Log.e("Servicio Rest", "Error!", e);
@@ -514,6 +554,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             Log.d("RESULTADO: ", data.getStringExtra("SCAN_RESULT"));
             codeQR = data.getStringExtra("SCAN_RESULT");
             Log.d("QR",codeQR);
+            new ObtieneQR().execute(codeQR);
         } else if(2 == requestCode) {
             Log.d("FOTO","Evaluar foto");
           //  Log.d("RESULTADO: ", data.getStringExtra(MediaStore.EXTRA_OUTPUT));
@@ -536,4 +577,59 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
 
         }
     }
+
+    class ObtieneQR extends AsyncTask<String,String,String>{
+        @Override
+        protected String doInBackground(String... params) {
+
+            String QR = params[0];
+            int code;
+
+            try{
+                List param = new ArrayList();
+                param.add(new BasicNameValuePair("photo", QR));
+                JSONObject json = jsonParser.makeHttpRequest(URL_CHECKQR,"POST",param);
+
+                Log.d("MENSAJE QR", json.getString("description"));
+                Log.d("CODE", json.getString("code"));
+
+                code = json.getInt("code");
+                if (code == 1){
+                    return json.getString("code");
+                }else{
+                    return json.getString("code");
+                }
+
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog = new ProgressDialog(LevantamientoProductoCableadoActivity.this);
+            dialog.setMessage("Chequeando QR");
+            dialog.setIndeterminate(false);
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            dialog.dismiss();
+
+            int code = Integer.parseInt(s);
+            if (code != 0){
+                Toast.makeText(LevantamientoProductoCableadoActivity.this,"Error, el producto ya ha sido asignado",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(intent);
+            }
+
+        }
+    }
+
+
 }
