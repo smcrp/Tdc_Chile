@@ -30,8 +30,7 @@ public class HistoricoSQLiteHelper extends SQLiteOpenHelper {
 
     // Antena TABLA - Nombre de Columnas
     private static final String NOMBRE = "nombre";
-    private static final String DIRECCION = "direccion";
-    private static final String EMPRESA = "empresa";
+    private static final String ID_PRODUCT = "idproduct";
     private static final String IDENTIFICADOR = "idN";
     private static final String LATITUD = "latitud";
     private static final String LONGITUD = "longitud";
@@ -41,9 +40,9 @@ public class HistoricoSQLiteHelper extends SQLiteOpenHelper {
     // String Sql="CREATE TABLE tbl_Historico (id INTEGER, idN TEXT, name TEXT)";
     String CREA_TABLA = "CREATE TABLE "
             + "tbl_Historico" + "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + IDENTIFICADOR + " TEXT," + EDIT + " TEXT" + ")";
+            + IDENTIFICADOR + " TEXT," + EDIT + " TEXT," + LONGITUD + " TEXT," + LATITUD + " TEXT," + ID_PRODUCT + " TEXT" + ")";
 
-    String Foto = "CREATE TABLE foto (Ruta TEXT, dnfoto TEXT )";
+    String Foto = "CREATE TABLE foto (Ruta TEXT, dnfoto TEXT, longi TEXT, lati TEXT, idproduct TEXT )";
     public HistoricoSQLiteHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }

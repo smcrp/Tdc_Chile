@@ -152,7 +152,7 @@ public class MainActivity extends ListActivity
                 String i = listaantenas.get(position).get(TAG_IDANTENA);
                 String e = listaantenas.get(position).get(TAG_DNIANTENA);
 
-                Toast.makeText(MainActivity.this, i, Toast.LENGTH_SHORT).show();
+             //   Toast.makeText(MainActivity.this, i, Toast.LENGTH_SHORT).show();
 
                 Bundle bundle = new Bundle();
                 bundle.putString("posicion", i);

@@ -154,6 +154,41 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * VERIFICAR SI EL QR EXISTE
+     */
+       public boolean obtenerQrRegistrados(String idQr) {
+        SQLiteDatabase db = this.getWritableDatabase();
+           String selectQuery = "SELECT * FROM " + TABLE_PRODUCTO
+                   + " WHERE " + ID_PRODUCT + "=?";
+           Cursor cursor = db.rawQuery(selectQuery, new String[] {idQr});
+
+           cursor.moveToLast();
+           if(cursor.getCount()<=0){
+               Log.v("tag","if 1 "+cursor.getCount());
+               return false;
+           }
+           Log.v("tag","2 else  "+cursor.getCount());
+
+           db.close();
+
+           return true;
+    }
+
+    /*/*       String selectQuery = "SELECT " + ID_PRODUCT + " FROM " + TABLE_PRODUCTO
+                + " WHERE " + ID_PRODUCT + " =  ("+ idQr + ")";
+
+        Log.e(LOG, selectQuery);
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+      //  if (cursor != null){
+        //    return true;
+        //}
+        if (cursor.moveToFirst()) {
+            return true;
+        }*/
+
+
+    /**
      * OBTENEMOS EL ULTIMO ID
      */
     public int obtenerUltIdRegistro() {
@@ -321,7 +356,7 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
 
                 + " WHERE "
                 + TABLE_PREGUNTA + "." + LEVEL + " = 2 AND "
-                //+ TABLE_PRODUCTO + "." + ID_PRODUCT + " = " + codeQr + " AND "
+               // + TABLE_PRODUCTO + "." + ID_PRODUCT + " = " + codeQr + " AND "
                 + TABLE_PRODUCTO + "." + ID_REGISTRO + " = " + idRegistro + " AND "
                 + TABLE_REGISTRO + "." + STATUS + " = 1 ";
 
@@ -367,12 +402,13 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
             do {
                 Products producto = new Products();
                 producto.setId(c.getString(c.getColumnIndex(ID_PRODUCT)));
-                producto.setQuestions(obtenerPreguntaQrJson(idRegistro,c.getString(c.getColumnIndex(ID_PRODUCT))));
+                producto.setQuestions(obtenerPreguntaQrJson(idRegistro, c.getString(c.getColumnIndex(ID_PRODUCT))));
                 productos.add(producto);
             } while (c.moveToNext());
         }
         return productos;
     }
+
     /**
      * OBTENEMOS TODOS LOS REGISTROS
      * */
@@ -520,9 +556,28 @@ public class RegistroSQLiteHelper extends SQLiteOpenHelper {
      */
     public void eliminarPregunta(Question pregunta){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_PREGUNTA, ID +" = " + pregunta.getId(), null);
+        db.delete(TABLE_PREGUNTA, ID + " = " + pregunta.getId(), null);
         cerrarBD();
     }
+
+
+    /**
+     * Eliminar Registro
+     */
+    public void eliminarProductoQr(Registro registro){
+        SQLiteDatabase db = this.getWritableDatabase();
+       // ContentValues values = new ContentValues();
+      /*  db.delete( TABLE_PREGUNTA +
+                "INNER JOIN " + TABLE_PRODUCTO + " ON " + TABLE_PRODUCTO + "." + ID_REGISTRO + " = " + TABLE_PREGUNTA + "." + ID_REGISTRO +
+                "WHERE " + TABLE_PREGUNTA + "." + ID_PRODUCT + " = " + TABLE_PRODUCTO + "." + ID_PRODUCT +
+                "AND " + TABLE_PREGUNTA + "." + ID_REGISTRO + "=" + pregunta );*/
+        db.delete(TABLE_PRODUCTO + " WHERE " + ID_REGISTRO + "=" + registro.getId(),null, null);
+        db.delete(TABLE_PREGUNTA + " WHERE " + ID_REGISTRO + "=" + registro.getId(),null, null );
+       // db.delete(TABLE_REGISTRO + " WHERE " + ID + "=" + registro.getId(),null, null);
+
+        cerrarBD();
+    }
+
 
     // Cerramos BD
     public void cerrarBD() {

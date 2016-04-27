@@ -12,6 +12,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -89,6 +91,12 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
     String dnfoto;
     int valPaused = 0;
     ProgressDialog dialog;
+    ProgressDialog dialogBd;
+    boolean idproduct = false;
+
+    LocationManager locationManager;
+    public static String proveedor, latitud, longitud;
+    public String estado_gps = "1";
 
     private static final String URL_CHECKQR = "http://186.103.141.44/TorresUnidas.com.Api/index.php/api/Levantamiento/validateNull";
     private static final String URL_PRODUCTO = "http://186.103.141.44/TorresUnidas.com.Api/index.php/api/Levantamiento/QuestionProduct";
@@ -99,6 +107,9 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_levantamiento_producto_cableado);
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        proveedor = LocationManager.NETWORK_PROVIDER;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -250,6 +261,8 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
             qr.setIdRegistro(Integer.parseInt(id_registro));//bd
             qr.setAnswer(codeQR);//vista
             db.guardarPregunta(qr);*/
+
+            /*    */
 
             db.guardarProducto(codeQR, Integer.parseInt(id_registro));
 
@@ -469,6 +482,7 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
                 db.guardarPregunta(q14);
 
                 Intent intentMain = new Intent(LevantamientoProductoCableadoActivity.this, MainElementosActivity.class);
+                Toast.makeText(LevantamientoProductoCableadoActivity.this, "Se creo el producto correctamente", Toast.LENGTH_SHORT).show();
                 intentMain.putExtra("idRegistro", id_registro);
                 startActivity(intentMain);
             } else{
@@ -518,26 +532,55 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
                     HistoricoSQLiteHelper helper = new HistoricoSQLiteHelper(getBaseContext(),"Historico",null,1);
                     SQLiteDatabase db = helper.getWritableDatabase();
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-                    File f = new File(android.os.Environment.getExternalStorageDirectory(), "img_" + timeStamp + ".jpg"); //ruta y nombre de la foto
 
-                    db.delete("foto", null, null);
+
+
+                    String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+                    File f = new File(android.os.Environment.getExternalStorageDirectory(), "img_" +timeStamp+ ".jpg"); //ruta y nombre de la foto
+
+                  //  db.delete("foto", null, null);
+                    if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                        estado_gps = "1";
+                    }
+                    //Si GPS está desactivado
+                    if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                        estado_gps = "0";
+                    }
+                    Location lg = locationManager.getLastKnownLocation(proveedor);
+                    if (lg != null) {
+
+                        StringBuilder builder = new StringBuilder();
+                        StringBuilder builder2 = new StringBuilder();
+
+                        //latitud = builder.append("Latitud: ").append((lg.getLatitude())).toString();
+                        latitud = builder.append(lg.getLatitude()).toString();
+                        Log.e("LATITUD", "LATITUD" + latitud);
+
+                        //longitud = builder.append(" Longitud: ").append((lg.getLongitude())).toString();
+                        longitud = builder2.append(lg.getLongitude()).toString();
+                        Log.e("LONGITUD", "LONGITUD" + longitud);
+
+                    }
 
                     foto = f.toString();
                     dnfoto = "img_" + timeStamp + ".jpg";
+
                     ContentValues ruta = new ContentValues();
                     ruta.put("Ruta ",foto);
                     ruta.put("dnfoto",dnfoto);
+                    ruta.put("longi",longitud);
+                    ruta.put("lati",latitud);
+                    ruta.put("idproduct",codeQR);
 
                     db.insert("foto", null, ruta);
                     db.close();
-
                     //foto = f.toString();
                     //app.setRuta(f.toString());
                     //app.setDnfoto("img_" + timeStamp + ".jpg");
                     //dnfoto = "img_" + timeStamp + ".jpg";
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
                     startActivityForResult(intent, 2);
+
                 } else if (options[item].equals("Cancelar")) {
                     dialog.dismiss();
                 }
@@ -553,8 +596,12 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
         if (REQUEST_CODE == requestCode && RESULT_OK == resultCode) {
             Log.d("RESULTADO: ", data.getStringExtra("SCAN_RESULT"));
             codeQR = data.getStringExtra("SCAN_RESULT");
-            Log.d("QR",codeQR);
-            new ObtieneQR().execute(codeQR);
+            Log.d("QR", codeQR);
+
+            new CheckQR().execute(codeQR); //para comprobar bd local
+            new ObtieneQR().execute(codeQR); //para comprobar en el servicio
+
+            //compararQr(codeQR);
         } else if(2 == requestCode) {
             Log.d("FOTO","Evaluar foto");
           //  Log.d("RESULTADO: ", data.getStringExtra(MediaStore.EXTRA_OUTPUT));
@@ -626,9 +673,56 @@ public class LevantamientoProductoCableadoActivity extends AppCompatActivity
                 Toast.makeText(LevantamientoProductoCableadoActivity.this,"Error, el producto ya ha sido asignado",Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 startActivity(intent);
+
             }
 
         }
+    }
+
+    class CheckQR extends AsyncTask<String,String,String>{
+        @Override
+        protected String doInBackground(String... params) {
+
+            String Qr = params[0];
+            String check= "OK";
+
+            try {
+                RegistroSQLiteHelper helper = new RegistroSQLiteHelper(getApplicationContext());
+
+                boolean result = helper.obtenerQrRegistrados(Qr);
+
+                if (result == true) {
+                    return check;
+                }else{
+                    check = "NO";
+                    return check;
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialogBd = new ProgressDialog(LevantamientoProductoCableadoActivity.this);
+            dialogBd.setMessage("Chequeando QR");
+            dialogBd.setIndeterminate(false);
+            dialogBd.setCancelable(false);
+            dialogBd.show();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            dialogBd.dismiss();
+            if (s != "NO"){
+                Toast.makeText(LevantamientoProductoCableadoActivity.this,"Error, el producto ya esta registrado",Toast.LENGTH_SHORT).show();
+               /* Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(intent);*/
+            }
+        }
+
     }
 
 

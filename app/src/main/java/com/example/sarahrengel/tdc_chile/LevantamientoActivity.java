@@ -209,7 +209,7 @@ public class LevantamientoActivity extends AppCompatActivity
             Log.e("REGISTRO", String.valueOf(registro.getId()));
             Log.e("REGISTRO", String.valueOf(registro.getName()));
 
-            if(registro.getQuestions().get(0).getName().equalsIgnoreCase("Ingresar nombre de la antena") && !registro.getQuestions().get(0).getAnswer().trim().equalsIgnoreCase("")) {
+            if(registro.getQuestions().get(0).getName().equalsIgnoreCase("Ingresar nombre de la torre") && !registro.getQuestions().get(0).getAnswer().trim().equalsIgnoreCase("")) {
                 //else
                 for (int i = 0; i < registro.getQuestions().size(); i++) {
                     Log.e("RESP", String.valueOf(registro.getQuestions().get(i).getId()));
@@ -217,6 +217,7 @@ public class LevantamientoActivity extends AppCompatActivity
                     Log.e("RESP", String.valueOf(registro.getQuestions().get(i).getAnswer()));
                 }
                 db.guardarRegistro(registro);
+                Toast.makeText(LevantamientoActivity.this, "Se guardo correctamente", Toast.LENGTH_SHORT).show();
                 final Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 startActivity(intent);
             }else {

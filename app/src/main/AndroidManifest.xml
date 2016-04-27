@@ -52,7 +52,7 @@
             android:label="@string/title_activity_levantamiento"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustPan"> <!-- android:parentActivityName=".MainActivity" -->
+            android:windowSoftInputMode="adjustResize"> <!-- android:parentActivityName=".MainActivity" -->
         </activity>
         <activity
             android:name=".LevantamientoProductoActivity"

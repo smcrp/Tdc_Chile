@@ -60,6 +60,9 @@ public class Fragment1 extends DialogFragment implements DialogInterface.OnClick
 
     String foto;
     String dnfoto;
+    String lati;
+    String longi;
+    String idproduct;
     ProgressDialog pDialog;
     ProgressDialog dialog;
     private static final String URL="http://186.103.141.44/TorresUnidas.com.Api/index.php/api/Levantamiento/uploadImage";
@@ -157,34 +160,34 @@ public class Fragment1 extends DialogFragment implements DialogInterface.OnClick
                     productsListJson.add(prodJson);
                 }
 
-                /*ArrayList<Question> preguntasNivel2 = db.obtenerPreguntaJson(Integer.parseInt(getArguments().getString("posicion")), 2);
-                ArrayList<Products> products = new ArrayList<Products>();
-                for (Question respuesta: preguntasNivel2) {
-                    Products prod = new Products();
-                    prod.setId(respuesta.getId());
-                    prod.setValue(respuesta.getAnswer());
-                    products.add(prod);
-                }*/
-
-
                 HistoricoSQLiteHelper helper = new HistoricoSQLiteHelper(getActivity(),"Historico",null,1);
                 SQLiteDatabase db1 = helper.getWritableDatabase();
 
                 Cursor c =  db1.rawQuery("select * from foto", null);
 
                 if (c.moveToFirst()){
-                    foto = c.getString(0);
-                    dnfoto = c.getString(1);
+
+                    do {
+                        foto = c.getString(0);
+                        dnfoto = c.getString(1);
+                        longi = c.getString(2);
+                        lati = c.getString(3);
+                        idproduct = c.getString(4);
+
+                        final String title = "foto";
+                        final String coordx = longi;
+                        final String coordy = lati;
+                        final String idproducto = idproduct;
+                        final String idquestion ="11";
+
+                        new Enviarfoto().execute(foto, dnfoto, title, coordx, coordy, idproducto, idquestion);
+
+                    } while (c.moveToNext());
+
                 }
+                db1.delete("foto", null, null);
                 db1.close();
                 db.close();
-                final String title = "foto";
-                final String coordx ="32552452552";
-                final String coordy = "5363663663";
-                final String idproduct ="11";
-                final String idquestion ="11";
-
-                new Enviarfoto().execute(foto, dnfoto, title, coordx, coordy, idproduct, idquestion);
 
               //  Log.d("RUTA FOTO", foto);
                 //Log.d("DN FOTO", dnfoto);
@@ -295,7 +298,7 @@ public class Fragment1 extends DialogFragment implements DialogInterface.OnClick
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(getActivity());
-            pDialog.setMessage("Subiendo la informacion" );
+            pDialog.setMessage("Subiendo Fotos" );
             pDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             pDialog.setCancelable(true);
             pDialog.show();
@@ -345,19 +348,6 @@ public class Fragment1 extends DialogFragment implements DialogInterface.OnClick
 
         // 11. return result
         return result;
-    }
-
-    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... urls) {
-            return POST(urls[0],jsonForm);
-        }
-        // onPostExecute displays the results of the AsyncTask.
-        @Override
-        protected void onPostExecute(String result) {
-            Log.e("RESULTADO",result);
-            dismiss();
-        }
     }
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException {
@@ -428,6 +418,8 @@ public class Fragment1 extends DialogFragment implements DialogInterface.OnClick
                 registro.setId(Integer.parseInt(getArguments().getString("posicion")));
                 RegistroSQLiteHelper db = new RegistroSQLiteHelper(((MainActivity)getActivity()).getBaseContext());
                 db.eliminarRegistro(registro);
+                db.eliminarProductoQr(registro);
+
                 MainActivity activity = (MainActivity)getActivity();
                 activity.consultarRegistros();
                 activity.mostrarResultRegistros();
